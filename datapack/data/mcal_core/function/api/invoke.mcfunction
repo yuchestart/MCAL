@@ -1,0 +1,1 @@
+function $(name) with storage mcal_core:functionargs

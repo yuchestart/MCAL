@@ -1,0 +1,1 @@
+data remove storage mcal_core:stack stack_registry[$(stack_ptr)]

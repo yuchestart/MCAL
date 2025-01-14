@@ -1,0 +1,25 @@
+{
+  "name": "mcal-language-support",
+  "displayName": "mcal-language-support",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "mcal",
+      "aliases": ["MCAL", "mcal"],
+      "extensions": [".mcal"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "mcal",
+      "scopeName": "source.mcal",
+      "path": "./syntaxes/mcal.tmLanguage.json"
+    }]
+  }
+}

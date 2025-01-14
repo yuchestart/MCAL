@@ -1,0 +1,41 @@
+MCAL
+Minecraft Command Abstraction Layer
+
+; - separate statements
+dec [datatype] [varname],[varnames] - Declare a variable, dynamically set
+dec_nbt [datatype] [varname],[varnames] - Declare an nbt variable
+dec_scoreboard [varname],[varnames] - Declare a scoreboard variable, assume datatype int
+set [varname] = [value] - Set a variable
+[function-name]([arguments]) - Call a function
+{[contents]} - Block scope
+while([condition])[statement] - Repeat statement while condition is true
+if([condition])[statement] - If condition is true then run statement
+elif([condition])[statement] - If the previous if/elif condition failed and this condition is true then run statement
+else [statement] - If the if condition is false run the statement
+execute<[modifiers]>[statement] - Execute the following command under "execute"
+function [datatype or void] [name] ([arguments]) [statement] - Declare a function with body of statement
+return [value] - Return the value
+module [name] [statement] - Declare a module
+import [filename] - Import a module
+extern<[functionname]> - Run an external function
+export [symbolname] - Export symbols
+// - Single line comment
+/**/ - Multiline comment
+struct{[members]} - Declare a struct
+entrypoint<[type]> - Mark a function as an entrypoint
+namespace [modulename] - Use all symbols in a module without the prefix
+[modulename]:: - access a symbol from a module
+Type can be: tick load
+
+Datatypes:
+
+
+~ ~ ~([substitution]) - Coordinate
+[name]:[item]/[items...] - Namespace
+[number][type] - Numeral, ex. -12i, 26.3f, 22.2d, 14b, 16s
+#[enum] - Enumeral, specific for commands
+"[string] \[escape]" - String
+
+Supported Operators:
++ - * / ! % && || 
+

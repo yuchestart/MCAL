@@ -1,0 +1,1 @@
+data modify storage mcal_core:stack stack_registry append value {}

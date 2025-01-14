@@ -1,0 +1,6 @@
+"""
+
+
+"""
+
+print("Minecraft Command Compiler")
