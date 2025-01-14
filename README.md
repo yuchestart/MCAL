@@ -1,6 +1,6 @@
 # MCAL : Minecraft Command Abstraction Layer
 
-##Introduction
+## Introduction
 MCAL exists to make sure your brain doesn't break when you code complex behavior.
 
 ## Project Structure
