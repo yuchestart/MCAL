@@ -1,0 +1,1 @@
+$return run data get storage mcal_core:stack stack_registry[$(stackptr)]$(path)

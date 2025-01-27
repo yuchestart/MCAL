@@ -1,0 +1,6 @@
+{
+    "pack":{
+        "description":"Runtime for compiled MCAL programs",
+        "pack_format":61
+    }
+}
