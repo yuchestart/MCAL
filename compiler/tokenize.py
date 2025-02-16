@@ -31,15 +31,25 @@ namespace""".split("\n")
 TOKEN_SPEC = [
     ("STRING",r'"(?:\\.|[^"\\])*"'),
     ("COMMENT",r'(?://.*$)|(?:/\*(?:.|\n)*\*/)'),
+    ("KEYWORD",r"\b(?:" + r"|".join(KEYWORD_LIST) + r")\b"),
     ("NUMBER",r'\b\d+(\.\d+)?([i|f|d|b|s]?)\b'),
     ("IDENTIFIER",r"\b[a-zA-Z_][a-zA-Z_0-9]*\b"),
-    ("KEYWORD",r"\b(?:" + r"|".join(KEYWORD_LIST) + r")\b")
+    ("BLOCK_START",r"\{"),
+    ("BLOCK_END",r"\}"),
+    ("COMMAND_CALL",r"!(?=\()"),
+    ("GROUP_START",r"\("),
+    ("GROUP_END",r"\)"),
+    ("TYPEGROUP",r"<(?:[^>\\])*>")
 ]
 
 
 def tokenize(code:str):
     tokens = []
-    token_regex = '|'.join(f'(?P<{name}{pattern}>)' for name,pattern in TOKEN_SPEC)
-    
-
+    token_regex = '|'.join(f'(?P<{name}>{pattern})' for name,pattern in TOKEN_SPEC)
+    for match in re.finditer(token_regex,code):
+        kind = match.lastgroup
+        value = match.group(kind)
+        if kind == "COMMENT":
+            continue
+        tokens.append({"type":kind,"data":value})
     return tokens
