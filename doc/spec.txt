@@ -2,6 +2,7 @@ MCAL
 Minecraft Command Abstraction Layer
 
 ; - separate statements
+! - run a command instead of invoking a function
 dec [datatype] [varname],[varnames] - Declare a variable, dynamically set
 dec_nbt [datatype] [varname],[varnames] - Declare an nbt variable
 dec_scoreboard [varname],[varnames] - Declare a scoreboard variable, assume datatype int

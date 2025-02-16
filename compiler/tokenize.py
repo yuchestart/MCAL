@@ -31,6 +31,7 @@ namespace""".split("\n")
 TOKEN_SPEC = [
     ("STRING",r'"(?:\\.|[^"\\])*"'),
     ("COMMENT",r'(?://.*$)|(?:/\*(?:.|\n)*\*/)'),
+    ("STATEMENT_SEPERATOR",r';'),
     ("KEYWORD",r"\b(?:" + r"|".join(KEYWORD_LIST) + r")\b"),
     ("NUMBER",r'\b\d+(\.\d+)?([i|f|d|b|s]?)\b'),
     ("IDENTIFIER",r"\b[a-zA-Z_][a-zA-Z_0-9]*\b"),
