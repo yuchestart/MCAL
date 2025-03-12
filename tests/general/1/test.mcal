@@ -1,0 +1,31 @@
+module main;
+
+class Thing{
+    int a;
+    int b;
+    static Thing create(int a, int b){
+        Thing ret = new Thing;
+        ret.a = a;
+        ret.b = b;
+        return ret;
+    }
+
+    int add(){
+        return this.a+this.b;
+    }
+
+    int subtract(){
+        return this.a-this.b;
+    }
+}
+
+entrypoint<load> void main(){
+    tellraw!(@a "Hi world!");
+    Thing mything = Thing::create(5,2);
+    int result = mything.add();
+    int result2 = mything.subtract();
+    tellraw!(@a "${result} ${result2}");
+
+    tellraw!(@a "${mything.a}");
+
+}
