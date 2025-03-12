@@ -1,6 +1,6 @@
 from typing import *
-from compiler.ast.nodes.values import Symbol,DataType,Value
-from compiler.ast.nodes.base import BaseNode
+from compiler.parse.nodes.values import Symbol,DataType,Value
+from compiler.parse.nodes.base import BaseNode
 
 class FunctionDataType(DataType):
     returnType:DataType

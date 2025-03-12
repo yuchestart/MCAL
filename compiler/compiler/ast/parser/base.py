@@ -1,5 +1,0 @@
-
-
-
-class ParserBase():
-    code:str

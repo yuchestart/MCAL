@@ -1,6 +1,6 @@
 from typing import *
 
-from compiler.ast.parser import Parser
+from compiler.parse.parser import Parser
 
 keywordParsers = {}
 

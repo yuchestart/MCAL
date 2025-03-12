@@ -1,6 +1,6 @@
-from compiler.ast.tokenizer.keywords import KEYWORDS
-from compiler.ast.tokenizer.primitives import PRIMITIVES
-from compiler.ast.tokenizer.operators import OPERATORS
+from compiler.parse.tokenizer.keywords import KEYWORDS
+from compiler.parse.tokenizer.primitives import PRIMITIVES
+from compiler.parse.tokenizer.operators import OPERATORS
 from typing import *
 
 TOKEN_PRIORITY =\

@@ -2,7 +2,7 @@
 from typing import *
 from dataclasses import dataclass
 
-from compiler.ast.nodes.base import BaseNode
+from compiler.parse.nodes.base import BaseNode
 
 class Identifier(BaseNode):
     ident:str

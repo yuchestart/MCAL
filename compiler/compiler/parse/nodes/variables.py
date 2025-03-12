@@ -1,6 +1,6 @@
 from typing import *
-from compiler.ast.nodes.values import DataType,Expression,Value
-from compiler.ast.nodes.base import BaseNode
+from compiler.parse.nodes.values import DataType,Expression,Value
+from compiler.parse.nodes.base import BaseNode
 
 class Int(DataType):
     pass
