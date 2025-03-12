@@ -9,7 +9,8 @@ from compiler.ast.parser.modules import ParserModules
 import pcre2
 from typing import *
 
-class Parser(ParserModules,ParserBase):
+
+class Parser(ParserModules, ParserBase):
 
     def __init__(self):
         self.code = COMPILERVARS.code
@@ -25,45 +26,42 @@ class Parser(ParserModules,ParserBase):
         elevation = 0
 
         for match in matches:
-            type = match.lastgroup
-          #  print(match.lastgroup)
+            match_type = match.lastgroup
+            #  print(match.lastgroup)
             # Toplevel statement
-            if type == "STATEMENT_SEPERATOR" and elevation == 0:
+            if match_type == "STATEMENT_SEPERATOR" and elevation == 0:
                 statements.append(self.code[lastposition : match.start() + 1])
                 lastposition = match.start() + 1
-            elif type == "BLOCK_START":
+            elif match_type == "BLOCK_START":
                 elevation += 1
-            elif type == "BLOCK_END":
+            elif match_type == "BLOCK_END":
                 elevation -= 1
                 if elevation == 0:
                     statements.append(self.code[lastposition : match.start() + 1])
                     lastposition = match.start() + 1
         print(statements)
         if elevation != 0:
-            #TODO: Provide error message
+            # TODO: Provide error message
             print("A bracket wasn't closed")
             return
 
         # Parse each statement
-        ast:List[BaseNode] = []
+        ast: List[BaseNode] = []
         for statement in statements:
-            succeeded,node = self.parse_toplevel(statement)
+            succeeded, node = self.parse_toplevel(statement)
             if succeeded:
                 ast.append(node)
 
         return ast
 
-    def parse_toplevel(self,statement:str)->Tuple[bool,BaseNode|None]:
-        toplevelparsers = [
-            self.parse_module_declaration,
-            self.parse_module_import
-        ]
-        parsedNode:BaseNode|None = None
-        succeeded:bool = False
+    def parse_toplevel(self, statement: str) -> Tuple[bool, BaseNode | None]:
+        toplevelparsers = [self.parse_module_declaration, self.parse_module_import]
+        parsedNode: BaseNode | None = None
+        succeeded: bool = False
 
         for parser in toplevelparsers:
-            succeeded,parsedNode = parser(statement)
+            succeeded, parsedNode = parser(statement)
             if succeeded:
                 break
-        
-        return succeeded,parsedNode
+
+        return succeeded, parsedNode
