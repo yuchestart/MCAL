@@ -1,8 +1,12 @@
 MCAL
 Minecraft Command Abstraction Layer
 
+Version 0.1
+
 ; - separate statements
 ! - run a command instead of invoking a function
+& - use this variable for heaps instead
+% - instantiate a struct
 dec [datatype] [varname],[varnames] - Declare a variable, dynamically set
 dec_nbt [datatype] [varname],[varnames] - Declare an nbt variable
 dec_scoreboard [varname],[varnames] - Declare a scoreboard variable, assume datatype int
@@ -19,13 +23,16 @@ return [value] - Return the value
 module [name] [statement] - Declare a module
 import [filename] - Import a module
 extern<[functionname]> - Run an external function
-export [symbolname] - Export symbols
+export [symbolname(s)] - Export symbols
 // - Single line comment
 /**/ - Multiline comment
 struct{[members]} - Declare a struct
 entrypoint<[type]> - Mark a function as an entrypoint
 namespace [modulename] - Use all symbols in a module without the prefix
 [modulename]:: - access a symbol from a module
+[struct]. - access a symbol from a struct or struct instance
+[struct]-> - call a function from a struct or struct instance
+$([identifier]) - Put an identifier inside a string; string substitution
 Type can be: tick load
 
 Datatypes:
@@ -38,5 +45,4 @@ Datatypes:
 "[string] \[escape]" - String
 
 Supported Operators:
-+ - * / ! % && || 
-
++ - * / ! % && || == > < >= <= != 
