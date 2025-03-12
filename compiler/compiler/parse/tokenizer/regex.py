@@ -63,7 +63,7 @@ TOKEN_REGEXES = {
     "TYPEGROUP" : r"(?<!\\)\<(?:[^\<\>\n]|\\[\<\>])*(?<!\\)\>",
     "SUBSTITUTION" : r"(?<!\\)\$\{(?:[^\{\}\n]|\\[\{\}])*(?<!\\)\}",
 
-    "WHITESPACE" : r"\s",
+    "WHITESPACE" : r"\s+",
     "UNKNOWN" : r"."
 }
 
