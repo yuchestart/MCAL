@@ -367,6 +367,18 @@ To import that module back, simply include the MCAL Symbol Definition file as a 
 import msdnamespace::somesymbol;
 ```
 
+## 4.4 Namespaces
+
+TODO: Write this
+
+Namespaces are used for multiple submodules.
+
+Usage:
+```
+namespace [namespace];
+```
+
+
 # 5.0 Data and Variables
 
 ## 5.1 Variable Declaration
@@ -440,12 +452,12 @@ tellraw!(@a "${somearr[0]}"); //3
 
 Functions are also a datatype. To represent a function, use this syntax:
 
-`function<[returntype]>([parameters])`
+`function([returntype])([parameters])`
 
 Here are a few examples:
 
 ```
-function<void>(int,int) mycallback = someFunctionDefinedElsewhere;
+function(void)(int,int) mycallback = someFunctionDefinedElsewhere;
 
 mycallback(1i,2i);
 ```
@@ -488,6 +500,23 @@ b[0] = 3; //a:[3,2,3] b:[3,2,3]
 int[] c = copy a;
 
 c[0] = 7; //a:[3,2,3] b:[3,2,3] c:[7,2,3]
+```
+
+In the case that you want to pass a primitive variable by reference, use the `&` suffix.
+
+Example:
+```mcal
+void complexCalculation(int& var1, int& var2){
+    var1 += 3;
+    var2 += 4;
+}
+
+entrypoint<load> void main(){
+    int a = 0;
+    int b = 1;
+    complexCalculation(a,b);
+    tellraw!(@a "${a} ${b}"); //3 5
+}
 ```
 
 ### 5.3.2 Casting

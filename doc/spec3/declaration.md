@@ -20,19 +20,19 @@ extern module api{
     export import math::*;
     export import entity::Entity;
 
-    export function void apifunction(int a, int b);
+    export void apifunction(int a, int b);
 }
 
 module math{
-    export function int add(int a, int b);
-    export function int subtract(int a, int b);
+    export int add(int a, int b);
+    export int subtract(int a, int b);
 }
 
 module entity{
     export class Entity{
         public int a;
         public int b;
-        protected void c();
+        static protected void c();
     }
 }
 ```
