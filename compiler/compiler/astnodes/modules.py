@@ -1,8 +1,8 @@
 from typing import *
 from dataclasses import dataclass
 
-from compiler.parse.nodes.values import Symbol
-from compiler.parse.nodes.base import BaseNode
+from compiler.astnodes.values import Symbol
+from compiler.astnodes.base import BaseNode
 
 @dataclass
 class ModuleImportNode(Symbol):

@@ -1,6 +1,6 @@
-from compiler.parse.tokenizer.keywords import KEYWORDS
-from compiler.parse.tokenizer.primitives import PRIMITIVES
-from compiler.parse.tokenizer.operators import OPERATORS
+from compiler.tokenizer.keywords import KEYWORDS
+from compiler.tokenizer.primitives import PRIMITIVES
+from compiler.tokenizer.operators import OPERATORS
 from typing import *
 
 TOKEN_PRIORITY =\
@@ -15,7 +15,6 @@ COORDINATE
 IDENTIFIER
 COMMAND_CALL
 FUNCTION_CALL
-TYPEGROUP
 OPERATOR
 BLOCK_START
 BLOCK_END
@@ -60,7 +59,6 @@ TOKEN_REGEXES = {
 
     #Misc.
     "COMMENT" : r'(?:\/\/.*$)|(?:\/\*(?:.|\n)*\*\/)',
-    "TYPEGROUP" : r"(?<!\\)\<(?:[^\<\>\n]|\\[\<\>])*(?<!\\)\>",
     "SUBSTITUTION" : r"(?<!\\)\$\{(?:[^\{\}\n]|\\[\{\}])*(?<!\\)\}",
 
     "WHITESPACE" : r"\s+",

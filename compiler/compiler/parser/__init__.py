@@ -1,16 +1,18 @@
 from compiler.util import COMPILERVARS, printError
-from compiler.parse.parser.base import ParserBase,ParserException
-from compiler.parse.tokenizer.regex import subset_regex, TOKEN_PRIORITY
+from compiler.parser.base import ParserBase,ParserException
+from compiler.tokenizer.regex import subset_regex, TOKEN_PRIORITY
 
-from compiler.parse.nodes.base import BaseNode
+from compiler.astnodes.base import BaseNode
 
-from compiler.parse.parser.modules import ParserModules
+from compiler.parser.modules import ParserModules
+from compiler.parser.variables import ParserVariables
+from compiler.parser.datatypes import ParserDataTypes
 
 import pcre2
 from typing import *
 
 
-class Parser(ParserModules, ParserBase):
+class Parser(ParserModules, ParserVariables, ParserDataTypes, ParserBase):
     def __init__(self):
         self.code = COMPILERVARS.code
         self.regex = subset_regex(TOKEN_PRIORITY)
@@ -56,7 +58,11 @@ class Parser(ParserModules, ParserBase):
         return ast
 
     def parse_toplevel(self, statement: str) -> Tuple[bool, BaseNode | None]:
-        toplevelparsers = [self.parse_module_declaration, self.parse_module_import]
+        toplevelparsers = [
+            self.parse_module_declaration,
+            self.parse_module_import,
+            self.parse_namespace_declaration
+        ]
         parsedNode: BaseNode | None = None
         succeeded: bool = False
 

@@ -1,7 +1,7 @@
-from compiler.parse.parser.base import ParserBase, ParserException
+from compiler.parser.base import ParserBase, ParserException
 
-from compiler.parse.nodes.base import BaseNode
-from compiler.parse.nodes.modules import (
+from compiler.astnodes.base import BaseNode
+from compiler.astnodes.modules import (
     ModuleDeclarationNode,
     ModuleImportNode,
     NamespaceDeclarationNode,
@@ -12,17 +12,13 @@ from typing import *
 
 
 class ParserModules(ParserBase):
-    def parse_namespace_declaration(
-        self, statement: str
-    ) -> Tuple[bool, NamespaceDeclarationNode]:
-        pass
 
     def parse_module_declaration(
         self, statement: str
     ) -> Tuple[bool, ModuleDeclarationNode]:
 
         retval = ModuleDeclarationNode([], [], [])
-        matches = list(pcre2.finditer(self.regex, statement))
+        matches = pcre2.finditer(self.regex, statement)
 
         i = 0
         for match in matches:
@@ -72,10 +68,9 @@ class ParserModules(ParserBase):
 
         return True, retval
 
-    def parse_module_import(self, statement: str) -> Tuple[bool, ModuleImportNode]:
-
-        retval = ModuleImportNode([], "")
-        matches = list(pcre2.finditer(self.regex, statement))
+    def parse_namespace_declaration(self, statement:str) -> Tuple[bool,NamespaceDeclarationNode]:
+        retval = NamespaceDeclarationNode("")
+        matches = pcre2.finditer(self.regex,statement)
 
         i = 0
         for match in matches:
@@ -84,8 +79,44 @@ class ParserModules(ParserBase):
 
             if match_type == "WHITESPACE" or match_type == "COMMENT":
                 continue
+            
+            #namespace keyword
+            if i == 0:
+                if match_type != "KEYWORD" or data != "namespace":
+                    return False,None
+                i+=1
+                continue
 
-            if i == 0 and (match_type != "KEYWORD" or data != "import"):
-                return False, None
+            if i == 1 and match_type != "IDENTIFIER":
+                raise ParserException("Invalid Syntax: Expected namespace",match.start())
 
-        return False, 0
+            retval.ident = data
+        
+        return True,retval
+
+    def parse_module_import(self, statement: str) -> Tuple[bool, ModuleImportNode]:
+        retval = ModuleImportNode([], "")
+        matches = pcre2.finditer(self.regex, statement)
+
+        i = 0
+        for match in matches:
+            match_type = match.lastgroup
+            data = match.group(0)
+
+            if match_type == "WHITESPACE" or match_type == "COMMENT":
+                continue
+            
+            #import keyword
+            if i == 0:
+                if match_type != "KEYWORD" or data != "import":
+                    return False,None
+                i+=1
+                continue
+
+            #identifier after import
+            if i == 1 and match_type != "IDENTIFIER":
+                raise ParserException("Invalid Syntax: Expected identifier",match.start())
+
+            retval.ident = data
+
+        return True, retval

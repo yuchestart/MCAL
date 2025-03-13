@@ -9,4 +9,5 @@ short
 string
 uuid
 compound
-function""".split("\n")
+function
+void""".split("\n")
