@@ -1,9 +1,10 @@
 MCAL (Minecraft Command Abstraction Language)
 =====
 
-**Version 0.3.0**
+**Version 0.3.1**
 Author: Che Yu
 Date: 2025-03-10
+Minecraft Version(s): 1.21.4 - 1.21.5
 
 **Overview**
 
@@ -13,119 +14,62 @@ You write your program in MCAL, chuck it into the compiler, and it spits out a s
 
 The file extension for MCAL files is `.mcal`
 
-# 1.0 Basic Syntax
+# Basic Syntax
 
-## 1.1 Operators
+## Operators
 | Operator | Description | Usage |
 |-|-|-|
 | `=` | Assignment | `[symbol] = [value]` |
 | `+=` | Addition Assignment | `[symbol] += [value]` |
 | `-=` | Subtraction Assignment | `[symbol] -= [value]`|
+| `*=` | Multiplication Assignment | `` |
+| `/=` | Division Assignment | `` |
+| `%=` | Modulo Assignment | `` |
+| `+` | Addition | `` |
+| `-` | Subtraction | `` |
+| `*` | Multiplication | `` |
+| `/` | Division | `` |
+| `%` | Modulo | `` |
+| `==` | Logical Equality | `` |
+| `!=` | Logical  | `` |
+| `&&` | | `` |
+| `\|\|` | | `` |
+| `!` | | `` |
+| `&` | | `` |
+| `<` | | `` |
+| `>` | | `` |
+| `<=` | | `` |
+| `>=` | | `` |
+| `++` | | `` |
+| `--` | | `` |
 
-# 2.0 Commands
+## Toplevel statements
 
-Minecraft commands are essential to any datapack. Without them, it's like drinking dehydrated water.
-
-MCAL must have a way to invoke minecraft commands, or it would be utterly useless.
-
-## 2.1 Invocation
-
-There are two ways to invoke Minecraft commands.
-
-The first method is single-command invocation, which is used to invoke a single command.
-
-Usage:
-```mcal
-[command]!([parameters]);
-```
-
-Example:
-```mcal
-tellraw!(@a "Hello world!"); //Notice how the command parameters are space-seperated, unlike functions.
-```
-
-If you ever need to invoke a huge block of commands, the second method of command invocation is the command invocation block(not to be confused with command blocks in-game). These blocks can span multiple lines.
-
-Usage:
-```mcal
-!{
-[commands]
-}
-```
+Toplevel statements are statements that are not contained within a function, class or similar but instead contained within the file itself.
 
 Example:
 ```mcal
-!{
+module main; //This is a toplevel statement
 
-tellraw @a "Command syntax is preserved here"
+dec_scoreboard minecraft:carrot_on_a_stick.use carrots; // This is also a toplevel statement
 
-# Comments look like this inside of command invocation blocks
-# This block of code turns snowballs into arrows
-# Which by extension turns snow golems into police officers
+tellraw!(@a "I'm toplevel too!");
 
-execute as @e[type=snowball] at @s run summon arrow ~ ~ ~ {Tags:["fired"]}
-execute as @e[type=arrow,tag=fired] at @s run data modify entity @s Owner set from entity @e[type=snowball,sort=nearest,limit=1] Owner
-execute as @e[type=arrow,tag=fired] at @s run data modify entity @s Motion set from entity @e[type=snowball,sort=nearest,limit=1] Motion
-execute as @e[type=snowball] kill @s
-
+//The function definition is a toplevel statement
+entrypoint<load> void main(){
+    execute!(at @p run summon sheep ~ ~ ~); //This isn't one, however.
 }
 ```
 
-## 2.2 Interpolation and Substitution
+All toplevel statements across all included files are executed before any entrypoint functions are run.
+Toplevel statements are executed top to bottom, and in the dependency tree back to front.
 
-MCAL variables and objects should also be able to interface with commands. That's where the `${}` operator comes in.
-
-With this operator, you can run MCAL expressions within command invocations, and have their return value be inserted into the command.
-
-Usage:
-```
-${[expression]}
-```
-
-Example:
-```
-tellraw!(@a "1+1 is ${1+1}");
-
-string toeliminate = "zombie";
-
-!{
-tellraw @a "Now exterminating all ${toeliminate}. WAHAHAHAHAHA!"
-execute as @e[type=${toeliminate}] run say "Please, spare me!"
-
-kill @e[type=${toeliminate}]
-}
-```
-
-## 2.3 `execute`
-Minecraft provides the versatile `execute` command. You can leverage it's power in MCAL with the `execute` blocks.
-
-Usage:
-```
-execute<[statements]>{
-    [code]
-}
-```
-
-Example:
-```
-//Make all the eggs clone themselves 5 times
-
-execute<as @e[type=item,nbt={Item:{id:"minecraft:egg"}}] at @s>{
-    for(int i=0; i<5; i++){
-        int randomx = random!(value 1..3) - 2;
-        int randomz = random!(value 1..3) - 2;
-        summon!(item ~${randomx} ~ ~${randomz} {Item:{id:"minecraft:egg"}})
-    }
-}
-
-```
-
-# 3.0 Control Flow
+# Control Flow
 
 Control flow is essential for many complicated tasks. However, it does happen to be kind of horrible to implement with Minecraft commands, so MCAL takes care of that for you.
 
 
-## 3.1 Branching
+## Branching
 
 Sometimes you need to run a portion of code if a condition is satisfied. To do so, use `if`, `elif`, and `else`.
 
@@ -156,11 +100,11 @@ if(a % 2 == 0){
 }
 ```
 
-## 3.2 Loops
+## Loops
 
 Loops are used to repeat actions.
 
-### 3.2.1 `for`
+### `for`
 
 The first type of loop in MCAL is the for-loop. For loops have iterators which are updated each loop, and a condition for stopping.
 
@@ -178,7 +122,7 @@ for(int i=0; i<10; i++){
 
 ```
 
-### 3.2.2 `while`
+### `while`
 
 The second type of loop in MCAL is the while-loop. While loops loop until a certain condition is met.
 
@@ -198,7 +142,7 @@ while(random!(value 1..10) != 10){
 tellraw!(@a "My bank account is sad now");
 ```
 
-### 3.2.3 `do`
+### `do`
 
 The third type is the do-while loop. Do while loops function similarly to while loops except that the loop code is run before checking the condition.
 
@@ -217,7 +161,7 @@ tellraw!(@a "Finally! I can stop rolling the dice!");
 ```
 
 
-### 3.2.4 `break` and `continue`
+### `break` and `continue`
 
 In the case where you need to end a loop prematurely, use the `break` keyword.
 
@@ -244,9 +188,9 @@ for(int i=0; i<10; i++){
 ```
 
 
-## 3.3 Functions
+## Functions
 
-### 3.3.1 Declaration
+### Declaration
 
 Functions are declared as follows:
 ```mcal
@@ -254,7 +198,7 @@ Functions are declared as follows:
 entrypoint<[entrypoint]> [datatype] [name] ([parameters]) { [code] }
 ```
 
-### 3.3.2 `return`
+### `return`
 
 To return a value from a function, use the following:
 
@@ -262,23 +206,32 @@ To return a value from a function, use the following:
 return [expression];
 ```
 
-### 3.3.3 Entrypoints
+## Error handling
 
 TODO: write this
 
+### `throw`
+
+### `try`, `catch`, and `finally`
+
+### `assert`
+Assertions are a quick way to throw an error. Assertions will pass if the condition defined inside is true, otherwise it will throw an error.
+
+Usage:
 ```mcal
-entrypoint<[type]> [...]
+assert([conditon])
 ```
 
-## 3.4 Error handling
+Example:
+```mcal
+//Check if the block at 0 0 0 is a chest
+block<minecraft:chest>? chest = new block<minecraft:chest>(0 0 0);
 
-TODO: write this
+//If it's not a chest, then this will throw an error.
+assert(chest != null);
+```
 
-### 3.4.1 `throw`
-
-### 3.4.2 `try`, `catch`, and `finally`
-
-# 4.0 Modules
+# Modules
 
 All code is organized into modules.
 A module line is to be included at the beginning of each file.
@@ -289,7 +242,7 @@ module Example;
 //... code goes here
 ```
 
-## 4.1 Symbol Sharing
+## Symbol Sharing
 Symbols can be exported and imported between modules.
 
 To export a symbol, place the `export` keyword in front of a symbol definition or name.
@@ -316,7 +269,7 @@ import Example::someSymbol; //Imports a symbol from the module
 import Example::*; //Imports all the symbols top-level
 ```
 
-## 4.2 The `using` keyword
+## The `using` keyword
 The `using` keyword is used to reference namespaces without explicitly defining them. The intent of this is to make code more readable.
 
 Usage:
@@ -341,7 +294,7 @@ entrypoint<load> function void onLoad(){
 
 ```
 
-## 4.3 External symbol sharing
+## External symbol sharing
 If you're developing something like a library, you need to be able to share symbols outside of the current program. To do that, you can mark a symbol or the whole module as `extern`.
 
 ```mcal
@@ -367,7 +320,7 @@ To import that module back, simply include the MCAL Symbol Definition file as a 
 import msdnamespace::somesymbol;
 ```
 
-## 4.4 Namespaces
+## Namespaces
 
 TODO: Write this
 
@@ -379,9 +332,9 @@ namespace [namespace];
 ```
 
 
-# 5.0 Data and Variables
+# Data and Variables
 
-## 5.1 Variable Declaration
+## Variable Declaration
 
 Variables are declared by placing the data type in front of the name.
 
@@ -391,9 +344,9 @@ int health = 20i; // Variables can be declared with starting values
 int inta, intb=30, intc; // Variables can also be declared in chains.
 ```
 
-## 5.2 Datatypes
+## Datatypes
 
-### 5.2.1 Primitives
+### Primitives
 
 Here are the primitive data types:
 | Type Name | Example |
@@ -410,8 +363,31 @@ Here are the primitive data types:
 
 Primitive data types have no callable methods.
 
+### Numbers
 
-### 5.2.2 Strings
+> **COMPATIBILITY WARNING** <br>
+> Signed and unsigned integers are only supported when targeting Java Edition 1.21.5<br>
+> Reason:<br>
+> Made possible by [25w09a](https://www.minecraft.net/en-us/article/minecraft-snapshot-25w09a)/SNBT Changes/Number Format -
+> _Integer type suffixes (`b` or `B` - byte, `s` or `S` - short, `i` or `I` - integer, `l` or `L`) can now be prefixed with `s`(signed) or `u` unsigned_
+
+Integers `int`, `byte`, `long` and `short` can have signed and unsigned variants.
+
+When using a literal or declaring a variable, by default the signed variants are used. However, you can explicitly declare them with `signed` and `unsigned`.
+
+For literals, to declare them signed or unsigned, place `u`(unsigned) or `s`(signed) before the type suffix.
+
+Example:
+
+```mcal
+unsigned int myUint = 4294967295; // Unsigned ints can go up to here, but they can only be positive
+signed int myInt = -2147483647; // Signed ints can go both ways, but for half the distance.
+int x = 3; // If you omit, the marker, signed variants are used by default.
+
+someFunction(8ub); // To pass specifically an unsigned byte, place the -ub suffix.
+```
+
+### Strings
 Strings are a sequence of characters, similar to an array. Strings are represented by the `string` keyword.
 The difference between strings and arrays are that strings can only store characters and are immutable.
 
@@ -426,7 +402,7 @@ someMethod("I'm a string"); //As a value
 
 Like arrays, strings have no callable methods.
 
-### 5.2.3 Arrays
+### Arrays
 
 To represent an array, you use the `[]` suffix.
 
@@ -435,38 +411,77 @@ int[] intarr; //Create an array of ints
 
 long[] longarr = [1l,2l,3l]; //Initialize an array of longs
 ```
-Arrays have no callable methods.
 
-Arrays can be subscripted as follows:
+Arrays can be subscripted to access and write to elements.
+
 ```
 int[] somearr = [1,2,3];
 
 tellraw!(@a "${somearr[0]}"); //1
 
-somearr[0] = 3;
+somearr[0] = 3; //Subscripting an array
 
 tellraw!(@a "${somearr[0]}"); //3
 ```
 
-### 5.2.4 Functions
+To manipulate arrays, you can use the methods `push([value])`, `pop([index])`, `insert([value],[index])`, `slice([start],[end])`, and `splice([start],[end]])`.
+
+Example:
+```mcal
+int[] arr = [1,2,3,4,5,6];
+
+arr.push(7); //arr: [1,2,3,4,5,6,7]
+
+arr.pop(0); //arr: [2,3,4,5,6,7]
+
+arr.insert(8,0); //arr: [8,2,3,4,5,6,7]
+
+int[] newarr = arr.slice(3,6);
+//newarr: [4,5,6]
+//arr: [8,2,3,4,5,6,7]
+
+newarr = arr.splice(1,6);
+//newarry: [8,2,3,4,5,6]
+//arr: [7]
+```
+
+To delete elements, use the `delete` keyword.
+```mcal
+delete [array][ [index] ]
+```
+
+Example:
+```mcal
+int[] arr = [1,2,3,4,5];
+
+delete arr[2]; //arr: [1,2,4,5]
+```
+
+### Functions
 
 Functions are also a datatype. To represent a function, use this syntax:
 
-`function([returntype])([parameters])`
+`function<[returntype]>([parameters])`
 
 Here are a few examples:
 
 ```
-function(void)(int,int) mycallback = someFunctionDefinedElsewhere;
+void someFunctionDefinedElsewhere(int a, int b){
+    tellraw!(@a "${a + b}");
+}
 
-mycallback(1i,2i);
+//...
+
+function<void>(int,int) mycallback = someFunctionDefinedElsewhere;
+
+mycallback(1i,2i); // 3
 ```
 
 This datatype is meant for callbacks and events.
 
 This datatype can be called itself, but it doesn't have any callable methods of it's own.
 
-### 5.2.5 Compounds
+### Compounds
 Compounds are essentially NBT Objects. They have no callable methods. They can be subscripted by `[]` or `.`.
 
 Compounds can hold any data type, so long as it's encapsulated in an NBT object.
@@ -481,9 +496,31 @@ compound mycompound = {
 };
 ```
 
-## 5.3 Data type behavior
+To delete a key from a compound, use the `delete` keyword.
 
-### 5.3.1 References
+Usage:
+```mcal
+delete [compoundkey]
+```
+
+Example:
+```
+compound mycompound = {
+    "key":"value",
+    "array":[1,2,3,4],
+    "nested"{
+        "objects":["are","very","nice"]
+    }
+};
+
+delete mycompound.key;
+delete mycompound.array[3];
+delete mycompound["nested"].objects[1];
+```
+
+## Behavior
+
+### References
 
 Primitives and strings are always passed by value.
 
@@ -519,7 +556,7 @@ entrypoint<load> void main(){
 }
 ```
 
-### 5.3.2 Casting
+### Casting
 
 Similar data types can be casted with `as`.
 
@@ -534,12 +571,64 @@ int myint = 5;
 float myfloat = myint as float;
 ```
 
+### Null values and safety
+> **COMPATIBILITY WARNING**<br>
+> These features are only supported when targeting Minecraft 1.21.5<br>
+> Reason:<br>
+> Made possible by 
+> [25w09a](https://www.minecraft.net/en-us/article/minecraft-snapshot-25w09a)/NBT Changes - 
+> _Any interface with NBT data within the game (SNBT representation, /data) now supports heterogeneous lists, i.e. ones where elements are not of the same type_
 
-## 5.4 Scoreboard objectives
+To denote a null value, use the `null` keyword.
+
+By default, variables cannot be null. To mark a variable as nullable, use the `?` suffix in a datatype.
+
+If you try to use a nullable value with a non-nullable datatype(e.g. calling a function), then the compiler will throw an error.
+Nullable data types can be cast back into their non-nullable counterparts with `as`.
+
+> **WARNING**<br>
+> When casting nullable to non-nullable, it **does not throw errors if the value is null**.<br>
+> You are to manage null safety in these situations, e.g. checking for null values.
+
+Example:
+```mcal
+void someFunction(int a){
+    tellraw!(@a "a is {a}.");
+}
+
+void someFriendlyFunction(int? a){
+    if(a == null){
+        tellraw!(@a "a is null, aborting...");
+        return;
+    }
+    tellraw!(@a "a is {a}.");
+}
+
+int? nullable = 17; // This variable is nullable. It is initialized to `null` by default.
+
+someFriendlyFunction(nullable); // Output: a is 17.
+someFunction(nullable); // This would throw a compiler error.
+// Do NOT cast to non-nullable types unless you have checked the value first.
+someFunction(nullable as int); // Output: a is 17.
+
+nullable = null;
+
+someFriendlyFunction(nullable); // Output: a is null, aborting...
+// Here's why you need to practice null safety.
+someFunction(nullable as int); // Output: a is [a bunch of random gibberish]
+```
+
+
+## Scoreboard objectives
 
 Scoreboard objectives can be declared and used similarly to variables.
 
 They are declared with the `dec_scoreboard` keyword.
+
+> **WARNING**<br>
+> Scoreboard objectives are deleted after the stack is exited.
+> If you wish to avoid this, declare them top-level instead.
+
 
 Usage:
 ```mcal
@@ -549,16 +638,12 @@ Example:
 ```mcal
 dec_scoreboard minecraft:carrot_on_a_stick.use clicks;
 ```
-> _**NOTICE**_<br>
-> Scoreboard objectives are deleted after the stack is exited.
-> If you wish to avoid this, declare them top-level instead.
 
+# Object-Oriented Programming
 
-# 6.0 Object-Oriented Programming
+## Declaration
 
-## 6.1 Declaration
-
-### 6.1.1 Overview
+### Overview
 
 To create a class, use the following format:
 ```
@@ -615,7 +700,7 @@ MyClass::method(MyClass::prop);
 ```
 
 
-### 6.1.2 Visibility
+### Visibility
 Sometimes you don't want members to be accessed outside a class. To achieve this, you can use visibility markers. The visibility markers include:
  * `public`: Accessible outside a class
  * `private`: Accessible inside a class
@@ -647,7 +732,7 @@ class MyClass{
 }
 ```
 
-### 6.1.3 The `partial` keyword
+### The `partial` keyword
 
 If you need to split a class across files, you can use the `partial` keyword.
 
@@ -682,7 +767,7 @@ partial class MyClass{
 ```
 
 
-## 6.2 Instances
+## Instances
 
 Class instances behave similarly to `compound`s, except you can use the methods defined in the class.
 
@@ -714,7 +799,7 @@ someFunction(instance as compound); //Explicit deserialization.
 
 
 
-## 6.3 Inheritance and Polymorphism
+## Inheritance and Polymorphism
 
 Classes can inherit eachother via the `extends` keyword. Classes can only extend from one class.
 
@@ -761,4 +846,191 @@ Extending prop: 56
 */
 myinstance.method();
 
+```
+
+# Minecraft Interop
+
+## Commands
+
+Minecraft commands are essential to any datapack. Without them, it's like drinking dehydrated water.
+
+MCAL must have a way to invoke minecraft commands, or it would be utterly useless.
+
+### Invocation
+
+There are two ways to invoke Minecraft commands.
+
+The first method is single-command invocation, which is used to invoke a single command.
+
+Usage:
+```mcal
+[command]!([parameters]);
+```
+
+Example:
+```mcal
+tellraw!(@a "Hello world!"); //Notice how the command parameters are space-seperated, unlike functions.
+```
+
+If you ever need to invoke a huge block of commands, the second method of command invocation is the command invocation block(not to be confused with command blocks in-game). These blocks can span multiple lines.
+
+Usage:
+```mcal
+!{
+[commands]
+}
+```
+
+Example:
+```mcal
+!{
+
+tellraw @a "Command syntax is preserved here"
+
+# Comments look like this inside of command invocation blocks
+# This block of code turns snowballs into arrows
+# Which by extension turns snow golems into police officers
+
+execute as @e[type=snowball] at @s run summon arrow ~ ~ ~ {Tags:["fired"]}
+execute as @e[type=arrow,tag=fired] at @s run data modify entity @s Owner set from entity @e[type=snowball,sort=nearest,limit=1] Owner
+execute as @e[type=arrow,tag=fired] at @s run data modify entity @s Motion set from entity @e[type=snowball,sort=nearest,limit=1] Motion
+execute as @e[type=snowball] kill @s
+
+}
+```
+
+### Interpolation and Substitution
+
+MCAL variables and objects should also be able to interface with commands. That's where the `${}` operator comes in.
+
+With this operator, you can run MCAL expressions within command invocations, and have their return value be inserted into the command.
+
+Usage:
+```
+${[expression]}
+```
+
+Example:
+```
+tellraw!(@a "1+1 is ${1+1}");
+
+string toeliminate = "zombie";
+
+!{
+tellraw @a "Now exterminating all ${toeliminate}. WAHAHAHAHAHA!"
+execute as @e[type=${toeliminate}] run say "Please, spare me!"
+
+kill @e[type=${toeliminate}]
+}
+```
+
+### `execute`
+Minecraft provides the versatile `execute` command. You can leverage it's power in MCAL with the `execute` blocks.
+
+Usage:
+```
+execute<[statements]>{
+    [code]
+}
+```
+
+Example:
+```
+//Make all the eggs clone themselves 5 times
+
+execute<as @e[type=item,nbt={Item:{id:"minecraft:egg"}}] at @s>{
+    for(int i=0; i<5; i++){
+        int randomx = random!(value 1..3) - 2;
+        int randomz = random!(value 1..3) - 2;
+        summon!(item ~${randomx} ~ ~${randomz} {Item:{id:"minecraft:egg"}})
+    }
+}
+
+```
+
+## Functions
+
+If a function needs to be run from a tag, like `minecraft:load`, the `entrypoint` keyword can be used to specify that.
+
+`entrypoint` can only be used on defined symbols, not anonymous functions.
+
+```mcal
+//This will run on minecraft:load
+entrypoint<minecraft:load> void main(){
+    tellraw!(@a "Hi world!");
+}
+```
+
+## NBT
+
+### Storage
+> **COMPATIBILITY WARNING**<br>
+> This feature is only supported when targeting Java Edition 1.21.5 <br>
+> Reason:<br>
+> This feature utilizes [nullable types](#null-values-and-safety), which are only supported when targeting Java Edition 1.21.5
+
+To access and modify the NBT data of storages without extra overhead, use the `storage` datatype.
+
+TODO: write this
+
+### Entities
+> **COMPATIBILITY WARNING**<br>
+> This feature is only supported when targeting Java Edition 1.21.5 <br>
+> Reason:<br>
+> This feature utilizes [nullable types](#null-values-and-safety), which are only supported when targeting Java Edition 1.21.5
+
+To access and modify the NBT data of entities without extra overhead, use the `entity` datatype.
+
+Usage as datatype:
+```mcal
+entity<[entityid]>
+```
+
+When initializing an entity, if the entity behind the uuid does not exist, then it will return null.
+
+Usage for initialization:
+```mcal
+new entity<[entityid]>([uuid])
+```
+
+Example:
+```
+//Get all the zombies
+entity<minecraft:zombie>[] zombies = [];
+
+execute<as @e[type=zombie]>{
+    //Return nullable
+    entity<minecraft:zombie>? zombie = new entity<minecraft:zombie>(data!(get entity @s UUID));
+    zombies.push(
+        //Cast to non-nullable for example's sake.
+        zombie as entity<minecraft:zombie>
+    );
+};
+```
+
+### Blocks
+
+> **COMPATIBILITY WARNING**<br>
+> This feature is only supported when targeting Java Edition 1.21.5 <br>
+> Reason:<br>
+> This feature utilizes [nullable types](#null-values-and-safety), which are only supported when targeting Java Edition 1.21.5
+
+To access and modify the NBT data of blocks without extra overhead, use the `block` datatype.
+
+Usage as datatype:
+```
+block<[blockid]>
+```
+
+Usage for initialization:
+```
+new block<[blockid]>([coordinate])
+```
+
+If the block at said coordinate is not of the same type, this expression will return `null`.
+
+Example:
+```
+//Mark it nullable 
+block<minecraft:chest>? myChest = block(0 0 0);
 ```
