@@ -4,6 +4,7 @@ MCAL Symbol Declaration
 **Version 0.3.0**
 Author: Che Yu
 Date: 2025-03-11
+Minecraft Version(s): 1.21.4 - 1.21.5
 
 # Overview
 
