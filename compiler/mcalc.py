@@ -1,6 +1,6 @@
 import sys
 import os
-from compiler.ast import generate_ast
+from compiler.parser import Parser
 from compiler.util import COMPILERVARS
 if len(sys.argv) == 1:
     print("MCALC - Minceraft Command Abstraction Language Compiler")
@@ -8,9 +8,8 @@ if len(sys.argv) == 1:
     print("mcalc --help")
     exit()
 if '--help' in sys.argv:
-    print("Insert Help Here")
-    print("Usage:")
-    print("mcalc [files] [options]")
+    with open("help/help.txt") as f:
+        print(f.read())
     exit()
 
 
@@ -22,4 +21,5 @@ for path in pathes:
     with open(path) as file:
         code = file.read()
         COMPILERVARS.setCode(code,path)
-        ast = generate_ast()
+        p = Parser()
+        ast = p.parse_file()

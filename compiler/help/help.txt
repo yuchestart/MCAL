@@ -1,0 +1,11 @@
+MCAL Compiler and Language Server
+Specification Version: 0.3.1
+Supported targets: 1.21.4 - 1.21.5
+
+Usage:
+mcalc.py [files] [options]
+mcalc.py [options] -- [files]
+
+Options:
+--help : Show this screen
+--language-server-mode : Use the MCAL Language Server
