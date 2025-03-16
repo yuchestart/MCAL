@@ -6,6 +6,7 @@ from compiler.astnodes.base import BaseNode
 from compiler.parser.declarations.modules import ParserModules
 from compiler.parser.declarations.variables import ParserDeclarationVariables
 from compiler.parser.declarations.functions import ParserDeclarationsFunctions
+from compiler.parser.expressions import ParserExpressions
 
 from compiler.tokenizer.interfaces import Token
 
@@ -15,8 +16,9 @@ from typing import *
 
 class ParserDeclarations(
     ParserModules,
+    ParserDeclarationVariables,
     ParserDeclarationsFunctions,
-    ParserDataTypes,
+    ParserExpressions,
     ParserBase
 ):
     def parse_declaration(self,statement:str)->Tuple[bool,BaseNode]:
