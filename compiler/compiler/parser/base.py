@@ -13,4 +13,3 @@ class ParserException(Exception):
 class ParserBase():
     code:str
     regex:str
-    

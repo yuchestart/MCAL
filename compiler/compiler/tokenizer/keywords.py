@@ -14,6 +14,7 @@ throw
 try
 catch
 finally
+assert
 export
 import
 extern
@@ -29,4 +30,7 @@ partial
 new
 as
 extends
-super""".split("\n")
+super
+null
+delete
+copy""".split("\n")

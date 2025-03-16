@@ -11,6 +11,7 @@ LIST_SEPERATOR
 KEYWORD
 PRIMITIVE
 NUMBER
+BOOLEAN
 COORDINATE
 IDENTIFIER
 COMMAND_CALL
@@ -45,7 +46,8 @@ TOKEN_REGEXES = {
     "PRIMITIVE" : r"\b(?:" + r"|".join(PRIMITIVES) + r")\b",
     
     #Literals
-    "NUMBER" : r'-?\d+(\.\d+)?(?:[b|s|S|l|L|f|F|d|D]?)\b',
+    "NUMBER" : r'(?:-?\d+(?:\.\d+)?)(?:u|s|U|S)?(?:[bBsSlLfFdD]?)\b',
+    "BOOLEAN": r"\b(?:true|false)\b",
     "COORDINATE" : r"(?:(?:~|\^)?-?\d*\.?\d+|(?:~|\^)) (?:(?:~|\^)?-?\d*\.?\d+|(?:~|\^)) (?:(?:~|\^)?-?\d*\.?\d+|(?:~|\^))",
     "NBT_OBJECT" : r"(\{(?:(?>[^{}\"'\/]+)|(?>\"(?:(?>[^\\\"]+)|\\.)*\")|(?>'(?:(?>[^\\']+)|\\.)*')|(?>\/\/.*\n)|(?>\/\*.*?\*\/)|(?-1))*\})",
     

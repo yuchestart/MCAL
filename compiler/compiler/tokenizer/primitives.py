@@ -10,4 +10,7 @@ string
 uuid
 compound
 function
-void""".split("\n")
+void
+entity
+block
+storage""".split("\n")

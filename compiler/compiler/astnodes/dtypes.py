@@ -42,16 +42,25 @@ class UuidDType(DataType):
 class CompoundDType(DataType):
     pass
 
+
 class Void(DataType):
     pass
+
 
 @dataclass
 class ArrayDType(DataType):
     of: DataType
 
+
 @dataclass
 class ReferenceDType(DataType):
     to: DataType
+
+
+@dataclass
+class NullableDType(DataType):
+    of: DataType
+
 
 @dataclass
 class FunctionDType(DataType):

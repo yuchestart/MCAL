@@ -22,13 +22,13 @@ class ParserModules(ParserBase):
 
         i = 0
         for match in matches:
-            match_type = match.lastgroup
+            token_type = match.lastgroup
             data = match.group(0)
 
-            if match_type == "WHITESPACE" or match_type == "COMMENT":
+            if token_type == "WHITESPACE" or token_type == "COMMENT":
                 continue
 
-            if i == 0 and match_type != "KEYWORD":
+            if i == 0 and token_type != "KEYWORD":
                 # module imports always start with keywords
                 return False, None
 
@@ -38,7 +38,7 @@ class ParserModules(ParserBase):
                 continue
 
             if retval.extern and i == 1 or not retval.extern and i == 0:
-                if match_type != "KEYWORD" or data != "module":
+                if token_type != "KEYWORD" or data != "module":
                     if retval.extern:
                         raise ParserException(
                             "Invalid Syntax: Expected 'module'", match.start()
@@ -50,7 +50,7 @@ class ParserModules(ParserBase):
                 continue
 
             # an identifier must follow module
-            if match_type != "IDENTIFIER" and i <= 2:
+            if token_type != "IDENTIFIER" and i <= 2:
                 raise ParserException(
                     "Invalid Syntax: Expected identifier", match.start()
                 )

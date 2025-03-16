@@ -7,13 +7,13 @@ from dataclasses import dataclass
 @dataclass
 class VariableDeclaration(Symbol):
     dataType: DataType
-    declarations: List[Tuple[str, Value]]
+    declarations: List[Tuple[str, Value|None]]
 
 
 @dataclass
 class ScoreboardDeclaration(Symbol):
     criteria: str
-    declarations: List[Tuple[str, Value]]
+    declarations: List[Tuple[str, Value|None]]
 
 
 @dataclass

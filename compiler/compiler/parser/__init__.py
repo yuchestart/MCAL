@@ -4,15 +4,15 @@ from compiler.tokenizer.regex import subset_regex, TOKEN_PRIORITY
 
 from compiler.astnodes.base import BaseNode
 
-from compiler.parser.modules import ParserModules
-from compiler.parser.variables import ParserVariables
-from compiler.parser.datatypes import ParserDataTypes
+from compiler.parser.declarations import ParserDeclarations
+from compiler.parser.expressions import ParserExpressions
+from compiler.parser.expressions.datatypes import ParserDataTypes
 
 import pcre2
 from typing import *
 
 
-class Parser(ParserModules, ParserVariables, ParserDataTypes, ParserBase):
+class Parser(ParserDeclarations, ParserBase):
     def __init__(self):
         self.code = COMPILERVARS.code
         self.regex = subset_regex(TOKEN_PRIORITY)
