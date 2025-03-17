@@ -1,5 +1,5 @@
-from compiler.astnodes.base import BaseNode
-from compiler.astnodes.values import Value,DataType
+from compiler.ast.base import BaseNode
+from compiler.ast.values import Value,DataType
 from dataclasses import dataclass
 
 from typing import *

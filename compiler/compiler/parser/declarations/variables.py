@@ -2,9 +2,9 @@ from compiler.parser.base import ParserBase, ParserException
 from compiler.parser.expressions.datatypes import ParserDataTypes
 from compiler.parser.expressions import ParserExpressions
 
-from compiler.astnodes.values import Identifier, Value, DataType
-from compiler.astnodes.base import BaseNode
-from compiler.astnodes.variables import (
+from compiler.ast.values import Identifier, Value, DataType
+from compiler.ast.base import BaseNode
+from compiler.ast.variables import (
     VariableDeclaration,
     ScoreboardDeclaration,
 )
@@ -25,8 +25,9 @@ class ParserDeclarationVariables(ParserExpressions,ParserDataTypes,ParserBase):
         matches = list(map(lambda x: Token(x.lastgroup,x.group(0),x.start()),pcre2.finditer(self.regex, statement)))
         
         index,dtype = self.parse_datatype(matches)
+        print(dtype,index)
 
-        retval.dtype = dtype
+        retval.dataType = dtype
     
 
         mode = "identifier" #"identifier" "equal" "value" "seperator"
@@ -36,6 +37,7 @@ class ParserDeclarationVariables(ParserExpressions,ParserDataTypes,ParserBase):
         while (i+1)<len(matches):
             i+=1
             token = matches[i]
+            print(token)
             if token.type in ["COMMENT","WHITESPACE"]:
                 continue
             if token.type == "STATEMENT_SEPERATOR":
@@ -60,10 +62,12 @@ class ParserDeclarationVariables(ParserExpressions,ParserDataTypes,ParserBase):
                     raise ParserException(f"Invalid Syntax: Unexpected '{token.data}'.",token.position)
                 mode = "value"
             elif mode == "value":
-                idx,v = self.parse_expression(self,matches[i:])
+                idx,v = self.parse_expression(matches[i:])
+                print(matches[i:],v)
                 value = v
-                i = idx+1
+                i = idx+i
                 mode = "seperator"
+                retval.declarations.append((name,value))
             elif mode == "seperator":
                 if token.type != "LIST_SEPERATOR":
                     raise ParserException(f"Invalid Syntax: Unexpected '{token.data}'.",token.position)

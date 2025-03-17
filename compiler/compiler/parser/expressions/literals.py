@@ -2,9 +2,9 @@ from compiler.parser.expressions.base import ParserExpressionsBase, ParserExcept
 
 from compiler.tokenizer.interfaces import Token
 
-from compiler.astnodes.values import Value
-from compiler.astnodes.primitives import Compound, Array, Number, String, Boolean
-from compiler.astnodes.dtypes import (
+from compiler.ast.values import Value
+from compiler.ast.primitives import Compound, Array, Number, String, Boolean
+from compiler.ast.dtypes import (
     IntDType,
     LongDType,
     ByteDType,
@@ -14,13 +14,13 @@ from compiler.astnodes.dtypes import (
 )
 
 from typing import *
+import re
 import pcre2
-from compiler.tokenizer.regex import S
 
 
 class ParserExpressionsLiterals(ParserExpressionsBase):
-
-    REGEX_NUMBER_SPLITTER = r"(-?\d+(?:\.\d+)?)(u|s|U|S)?([bsSlLfFdD]?)\b"
+    # Use regular RE for this, as pcre2 throws an error
+    REGEX_NUMBER_SPLITTER = r"(-?\d+(?:\.\d+)?)(u|s|U|S)?([bBsSiIlLfFdD])?\b"
     NUMBER_SUFFIX_DTYPES = {
         "i": IntDType,
         "l": LongDType,
@@ -54,17 +54,17 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
             if token.type != "NUMBER":
                 break
 
-            match = pcre2.match(self.REGEX_NUMBER_SPLITTER, token.data)
-            groups: Tuple[str] = match.groups()
-            ret = Number(groups[0])
+            match = re.match(self.REGEX_NUMBER_SPLITTER, token.data)
+            groups: Tuple[str] = list(filter(lambda x: x is not None,match.groups()))
+            ret = Number(groups[0],IntDType())
 
             if len(groups) == 3:
                 ret.signed = groups[1].lower() == "s"
-                ret.dataType = self.NUMBER_SUFFIX_DTYPES[groups[2].lower()]()
-            elif len(groups) >= 2:
-                ret.dataType = self.NUMBER_SUFFIX_DTYPES[groups[1].lower()]()
-
+                ret.type = self.NUMBER_SUFFIX_DTYPES[groups[2].lower()]()
+            elif len(groups) == 2:
+                ret.type = self.NUMBER_SUFFIX_DTYPES[groups[1].lower()]()
             break
+
         return finalidx, ret
 
     def parse_expression_string(self, tokens: List[Token]) -> Tuple[int, String | None]:
@@ -76,20 +76,9 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
                 continue
             if t.type != "STRING":
                 return finalidx, ret
-            raw_str = t.data
+            raw_str = t.data[1:-1] # Remove the quotes
             break
-
-        escape = False
-        escaped_str = ""
-        for i, char in enumerate(raw_str):
-            if escape:
-                escaped_str += char
-                escape = False
-                continue
-            if char == "\\":
-                escape = True
-                continue
-            escaped_str += char
+        
 
         # String substitution expressions, like ${}
         # Any string breaking characters inside one still must be escaped with \
@@ -97,19 +86,28 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
         sub_str = {}
         final_str = ""
         state = "none"
+        escape = False
         i = -1  # Kinda wish there was do-while in python, but alas
-        while (i + 1) < len(escaped_str):
+        while (i + 1) < len(raw_str):
             i += 1
-            char = escaped_str[i]
+            char = raw_str[i]
+            if escape:
+                final_str += char
+                escape = False
+                continue
+            if char == "\\":
+                escape = True
+                continue
             if char == "$":
                 state = "check"
-            if state == "check":
+            elif state == "check":
                 if char != "{":
                     state = "none"
-                else:
-                    state = "substituting"
-                    continue
-            if state == "substituting":
+                state = "substituting"
+                #delete the $
+                final_str = final_str[:-1]
+                continue
+            elif state == "substituting":
                 rest = map(
                     lambda x: Token(x.lastgroup, x.group(0), x.start()),
                     pcre2.finditer(self.regex, raw_str[i:]),
@@ -117,6 +115,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
                 cursub = []
                 elevation = 0
                 nexti = 0
+                print(i)
                 for j,t in enumerate(rest):
                     if t.type in ["COMMENT", "WHITESPACE"]:
                         continue
@@ -128,8 +127,8 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
                             nexti = j
                             break
                     cursub.append(t)
-                sub_str[(i, nexti)] = cursub
-                i = nexti
+                sub_str[(i, i+nexti)] = cursub
+                i += nexti
                 state = "none"
             final_str += char
 
@@ -142,7 +141,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
         return finalidx, ret
 
     def parse_expression_array(self, tokens: List[Token]) -> Tuple[int, Array | None]:
-        ret: Array = Array([])
+        ret: Array = None
         finalidx = 0
 
         state = "begin"
@@ -152,14 +151,12 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
             token = tokens[i]
             if token.type in ["COMMENT", "WHITESPACE"]:
                 continue
-            if token.type == "ARRAY_START":
-                if state != "begin":
-                    raise ParserException(
-                        "Invalid Syntax: Unexpected '['", token.position
-                    )
+            if state == "begin":
+                if token.type != "ARRAY_START":
+                    break
                 state = "value"
 
-            if state == "value":
+            elif state == "value":
                 rest = tokens[i:]
                 valtokens = []
                 nexti = 0
@@ -180,7 +177,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
                 ret.values.append(val)
                 state = "seperator"
 
-            if state == "seperator":
+            elif state == "seperator":
                 if token.type == "LIST_SEPERATOR":
                     state = "value"
                 elif token.type == "ARRAY_END":
@@ -196,4 +193,26 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
     def parse_expression_compound(
         self, tokens: List[Token]
     ) -> Tuple[int, Value | None]:
-        pass
+        #TODO: Implement
+        return 0, None
+
+    def parse_literal(
+        self, tokens:List[Token]
+    ) -> Tuple[int, Value | None]:
+        parsers = [
+            self.parse_expression_array,
+            self.parse_expression_bool,
+            self.parse_expression_compound,
+            self.parse_expression_number,
+            self.parse_expression_string
+        ]
+        ret: Value | None = None
+        finalpos:int = 0
+        for parser in parsers:
+            pos, node = parser(tokens)
+            if node is not None:
+                ret = node
+                finalpos = pos
+                break
+        
+        return finalpos,ret

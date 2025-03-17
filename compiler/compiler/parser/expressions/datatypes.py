@@ -1,5 +1,5 @@
-from compiler.astnodes.values import DataType, Identifier
-from compiler.astnodes.dtypes import (
+from compiler.ast.values import DataType, Identifier
+from compiler.ast.dtypes import (
     UuidDType,
     BoolDType,
     ByteDType,
@@ -17,7 +17,7 @@ from compiler.astnodes.dtypes import (
     NullableDType,
 )
 
-from compiler.astnodes.minecraftobjs import (
+from compiler.ast.minecraftobjs import (
     MinecraftObjDType,
     StorageDType,
     EntityDType,

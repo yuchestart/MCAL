@@ -1,6 +1,6 @@
 
 from dataclasses import dataclass
-from compiler.astnodes.values import DataType
+from compiler.ast.values import DataType
 from typing import *
 
 @dataclass

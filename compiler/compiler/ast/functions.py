@@ -1,6 +1,6 @@
 from typing import *
-from compiler.astnodes.values import Symbol, DataType, Value
-from compiler.astnodes.base import BaseNode
+from compiler.ast.values import Symbol, DataType, Value
+from compiler.ast.base import BaseNode
 
 
 class FunctionDeclaration(Symbol):

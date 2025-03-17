@@ -1,6 +1,6 @@
 from typing import *
-from compiler.astnodes.values import DataType, Expression, Value, Symbol, Identifier
-from compiler.astnodes.base import BaseNode
+from compiler.ast.values import DataType, Expression, Value, Symbol, Identifier
+from compiler.ast.base import BaseNode
 from dataclasses import dataclass
 
 

@@ -1,8 +1,8 @@
 from compiler.parser.base import ParserBase, ParserException
 from compiler.parser.expressions.datatypes import ParserDataTypes
 
-from compiler.astnodes.values import Identifier, Value, DataType
-from compiler.astnodes.base import BaseNode
+from compiler.ast.values import Identifier, Value, DataType
+from compiler.ast.base import BaseNode
 from compiler.parser.declarations.modules import ParserModules
 from compiler.parser.declarations.variables import ParserDeclarationVariables
 from compiler.parser.declarations.functions import ParserDeclarationsFunctions

@@ -2,7 +2,7 @@ from compiler.util import COMPILERVARS, printError
 from compiler.parser.base import ParserBase,ParserException
 from compiler.tokenizer.regex import subset_regex, TOKEN_PRIORITY
 
-from compiler.astnodes.base import BaseNode
+from compiler.ast.base import BaseNode
 
 from compiler.parser.declarations import ParserDeclarations
 from compiler.parser.expressions import ParserExpressions
@@ -70,6 +70,5 @@ class Parser(ParserDeclarations, ParserBase):
             succeeded, parsedNode = parser(statement)
             if succeeded:
                 break
-            break
 
         return succeeded, parsedNode

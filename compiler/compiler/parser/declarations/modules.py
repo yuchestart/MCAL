@@ -1,7 +1,7 @@
 from compiler.parser.base import ParserBase, ParserException
 
-from compiler.astnodes.base import BaseNode
-from compiler.astnodes.modules import (
+from compiler.ast.base import BaseNode
+from compiler.ast.modules import (
     ModuleDeclarationNode,
     ModuleImportNode,
     NamespaceDeclarationNode,

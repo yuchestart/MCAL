@@ -1,7 +1,7 @@
 from compiler.parser.base import ParserBase, ParserException
 
 from compiler.tokenizer.interfaces import Token
-from compiler.astnodes.base import BaseNode
+from compiler.ast.base import BaseNode
 
 import pcre2
 from typing import *
