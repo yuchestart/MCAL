@@ -1,2 +1,5 @@
 tests/
 *.test.py
+.venv
+.vscode
+.VSCodeCounter
