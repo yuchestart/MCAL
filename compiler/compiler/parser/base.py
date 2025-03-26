@@ -1,4 +1,5 @@
 from compiler.util import printError
+from compiler.tokenizer.interfaces import Token
 
 class ParserException(Exception):
     kind:str
@@ -13,3 +14,6 @@ class ParserException(Exception):
 class ParserBase():
     code:str
     regex:str
+    
+    def ignore(self,token:Token)->bool:
+        return token.type in ["COMMENT","WHITESPACE"]
