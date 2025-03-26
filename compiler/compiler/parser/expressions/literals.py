@@ -34,7 +34,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
         finalidx = 0
         ret: Boolean = None
         for i, token in enumerate(tokens):
-            if token.type in ["COMMENT", "WHITESPACE"]:
+            if self.ignore(token):
                 continue
             if token.type != "BOOLEAN":
                 break
@@ -48,7 +48,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
         finalidx = 0
         ret: Number = None
         for i, token in enumerate(tokens):
-            if token.type in ["COMMENT", "WHITESPACE"]:
+            if self.ignore(token):
                 continue
 
             if token.type != "NUMBER":
@@ -72,7 +72,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
         ret: String = None
         raw_str: str = ""
         for i, t in enumerate(tokens):
-            if t.type in ["COMMENT", "WHITESPACE"]:
+            if self.ignore(t):
                 continue
             if t.type != "STRING":
                 return finalidx, ret
@@ -117,7 +117,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
                 nexti = 0
                 print(i)
                 for j,t in enumerate(rest):
-                    if t.type in ["COMMENT", "WHITESPACE"]:
+                    if self.ignore(t):
                         continue
                     if t.type == "BLOCK_START":
                         elevation += 1
@@ -134,7 +134,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
 
         sub_ast = {}
         for k in sub_str:
-            sub_ast[k] = self.parse_expression(sub_str[k])
+            sub_ast[k] = self.parse_expression(sub_str[k])[1]
 
         ret = String(final_str, sub_ast)
 
@@ -149,7 +149,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
         while (i + 1) < len(tokens):
             i += 1
             token = tokens[i]
-            if token.type in ["COMMENT", "WHITESPACE"]:
+            if self.ignore(token):
                 continue
             if state == "begin":
                 if token.type != "ARRAY_START":
@@ -162,7 +162,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
                 nexti = 0
                 elevation = 0
                 for j, t in enumerate(rest):
-                    if t.type in ["COMMENT","WHITESPACE"]:
+                    if self.ignore(t):
                         continue
                     if t.type == "ARRAY_START":
                         elevation += 1
@@ -196,7 +196,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
         #TODO: Implement
         return 0, None
 
-    def parse_literal(
+    def parse_expression_literal(
         self, tokens:List[Token]
     ) -> Tuple[int, Value | None]:
         parsers = [
