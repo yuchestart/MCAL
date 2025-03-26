@@ -8,4 +8,5 @@ mcalc.py [options] -- [files]
 
 Options:
 --help : Show this screen
---language-server-mode : Use the MCAL Language Server
+--language-server : Run an MCAL LSP Host
+--: See the output of the compiled commands instead
