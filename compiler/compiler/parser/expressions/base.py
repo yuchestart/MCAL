@@ -8,8 +8,10 @@ from typing import *
 
 
 class ParserExpressionsBase(ParserBase):
-    # This method is gonna get overridden by ParserExpressions
-    # I'm doing this soley so I can use mixins
-    # Also I tested that it actually works trust me please
+    
+
+    def parse_expression_atom(self,token:List[Token])->Tuple[int,BaseNode|None]:
+        pass
+    
     def parse_expression(self,token:List[Token])->Tuple[int,BaseNode]:
         pass
