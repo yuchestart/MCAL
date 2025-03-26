@@ -641,7 +641,7 @@ dec_scoreboard minecraft:carrot_on_a_stick.use clicks;
 
 # Object-Oriented Programming
 
-## Declaration
+## Class Declaration
 
 ### Overview
 
@@ -767,7 +767,7 @@ partial class MyClass{
 ```
 
 
-## Instances
+## Class Instances
 
 Class instances behave similarly to `compound`s, except you can use the methods defined in the class.
 
@@ -799,7 +799,7 @@ someFunction(instance as compound); //Explicit deserialization.
 
 
 
-## Inheritance and Polymorphism
+## Class Inheritance and Polymorphism
 
 Classes can inherit eachother via the `extends` keyword. Classes can only extend from one class.
 
@@ -846,6 +846,34 @@ Extending prop: 56
 */
 myinstance.method();
 
+```
+
+## Structs
+Structs are templates for `compound` values.
+
+To declare a struct:
+
+Usage:
+```
+struct [name]{
+    [fields]
+}
+```
+
+To use structs, use the name of the struct as a datatype. If you need to create a struct, use the `new` keyword similar to classes.
+
+Example:
+```
+struct CustomItemIdentifier{
+    string itemId;
+    bool isPlaceable;
+}
+
+//...
+
+CustomItemIdentifier ci = new CustomItemIdentifier;
+ci.itemId = "red_emerald_block";
+ci.isPlaceable = true;
 ```
 
 # Minecraft Interop
