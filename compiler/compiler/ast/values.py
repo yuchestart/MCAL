@@ -1,4 +1,3 @@
-
 from typing import *
 from dataclasses import dataclass
 
@@ -21,6 +20,7 @@ class Value(Expression):
 class Identifier(BaseNode):
     ident:str
 
-class OperationChain(Expression):
+@dataclass
+class OperatorChain(Expression):
     operations:List[str]
     operands:List[Expression]
