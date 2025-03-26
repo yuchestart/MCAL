@@ -38,7 +38,7 @@ class ParserDeclarationVariables(ParserExpressions,ParserDataTypes,ParserBase):
             i+=1
             token = matches[i]
             print(token)
-            if token.type in ["COMMENT","WHITESPACE"]:
+            if self.ignore(token):
                 continue
             if token.type == "STATEMENT_SEPERATOR":
                 if len(retval.declarations) == 0:

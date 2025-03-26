@@ -61,7 +61,7 @@ class ParserDataTypes(ParserBase):
         finalidx = 0
         elevation = 0
         for i, token in enumerate(tokens):
-            if token.type in ["COMMENT", "WHITESPACE"]:
+            if self.ignore(token):
                 continue
             if token.type not in ["PRIMITIVE", "IDENTIFIER", "OPERATOR"]:
                 raise ParserException(
@@ -108,7 +108,7 @@ class ParserDataTypes(ParserBase):
             i += 1
             token = tokens[i]
 
-            if token.type in ["COMMENT", "WHITESPACE"]:
+            if self.ignore(token):
                 continue
 
             if functionmode == "ret_start":
@@ -123,7 +123,7 @@ class ParserDataTypes(ParserBase):
                 returntype_tokens = []
                 rest = tokens[i:]
                 for j, t in enumerate(rest):
-                    if t.type in ["COMMENT", "WHITESPACE"]:
+                    if self.ignore(t):
                         continue
                     if t.type == "OPERATOR":
                         if t.data == "<":
@@ -153,7 +153,7 @@ class ParserDataTypes(ParserBase):
                 rest = tokens[i:]
                 currentparam = []
                 for j, t in enumerate(rest):
-                    if t.type in ["COMMENT", "WHITESPACE"]:
+                    if self.ignore(t):
                         continue
                     if t.type == "GROUP_START":
                         elevation += 1
@@ -198,7 +198,7 @@ class ParserDataTypes(ParserBase):
 
         # Parse regular primitives
         for i, token in enumerate(tokens):
-            if token.type in ["COMMENT", "WHITESPACE"]:
+            if self.ignore(token):
                 continue
 
             if token.type not in [
@@ -245,7 +245,7 @@ class ParserDataTypes(ParserBase):
         rest = tokens[finalidx + 1 :]
         elevation = 0
         for i, token in enumerate(rest):
-            if token.type in ["COMMENT", "WHITESPACE"]:
+            if self.ignore(token):
                 continue
             if token.type not in ["ARRAY_START", "ARRAY_END", "OPERATOR"]:
                 break
