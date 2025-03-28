@@ -33,4 +33,5 @@ extends
 super
 null
 delete
-copy""".split("\n")
+copy
+namespace""".split("\n")
