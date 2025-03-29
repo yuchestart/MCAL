@@ -14,5 +14,14 @@ Test MCAL scripts are located under the `tests` folder.
 
 Documentation such as the language specification are located under the `doc` folder.
 
+## FAQ
+Why use this? If you need to create complicated datapacks, e.g. for maps or servers, then you can use high-level abstractions to do so.
+
+Is this available on Bedrock? No. MCAL relies too heavily on the `/data` command and JE function macros. If you want high-level abstractions on Bedrock, JS is available.
+
+What versions does it target? JE 1.21.5 or later.
+
+What do I need to run this? You need Python to compile your programs.
+
 ## Licensing
-MCAL is licensed under 0BSD. Read more about it [here](LICENSE)
+MCAL is licensed under MIT. Read more about it [here](LICENSE)
