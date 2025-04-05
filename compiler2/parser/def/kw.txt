@@ -1,0 +1,69 @@
+# control
+## if
+if
+elif
+else
+## loop
+for
+while
+do
+continue
+break
+## function
+return
+entrypoint
+## error
+try
+catch
+finally
+assert
+throw
+## switch
+switch
+case
+default
+# modules
+import
+export
+extern
+module
+using
+namespace
+# oop
+## classes
+class
+public
+private
+protected
+static
+partial
+super
+new
+## polymorphism
+interface
+extends
+implements
+# data
+as
+null
+copy
+delete
+# mincraft
+dec_scoreboard
+dec_command
+# primitives
+int
+float
+long
+double
+short
+byte
+bool
+true
+false
+string
+uuid
+coordinate
+entity
+block
+storage
