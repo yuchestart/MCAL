@@ -1,0 +1,7 @@
+namespace std;
+module nbt;
+
+export struct BlockState{
+    string Name;
+    compound Properties;
+}

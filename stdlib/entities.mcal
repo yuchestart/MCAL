@@ -1,0 +1,40 @@
+namespace std;
+module entities;
+
+import std::nbt::*;
+
+struct BaseEntity{
+    short Air;
+    string CustomName;
+    bool CustomNameVisible;
+    compound data;
+    double fall_distance;
+    short Fire;
+    bool Glowing;
+    bool HasVisualFire;
+    string id;
+    double[] Motion;
+    bool NoGravity;
+    bool OnGround;
+    BaseEntity[] Passengers;
+    int PortalCooldown;
+    double[] Pos;
+    float[] Rotation;
+    bool Silent;
+    string[] Tags;
+    int TicksFrozen;
+    uuid UUID;
+}
+
+export struct entity<minecraft:marker> : BaseEntity { }
+
+export struct entity<minecraft:falling_block> : BaseEntity {
+    BlockState BlockState;
+    bool CancelDrop;
+    bool DropItem;
+    float FallHurtAmount;
+    int FallHurtMax;
+    bool HurtEntities;
+    compound TileEntityData;
+    int Time;
+}

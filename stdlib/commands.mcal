@@ -1,0 +1,9 @@
+namespace std;
+module commands;
+
+
+export command minecraft:item{
+    void|modify (?:block <coordinate>|entity <selector>) <path> <name>?
+    void|replace (?:block <coordinate>|entity <selector>) <path> with <item> <int>
+    void|replace (?:block <coordinate>|entity <selector>) <path> from (?:block <coordinate>|entity <selector>) <path> <name>?
+}
