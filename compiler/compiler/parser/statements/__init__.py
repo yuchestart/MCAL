@@ -3,9 +3,9 @@ from compiler.parser.expressions.datatypes import ParserDataTypes
 
 from compiler.ast.values import Identifier, Value, DataType
 from compiler.ast.base import BaseNode
-from compiler.parser.declarations.modules import ParserModules
-from compiler.parser.declarations.variables import ParserDeclarationVariables
-from compiler.parser.declarations.functions import ParserDeclarationsFunctions
+from compiler.parser.statements.modules import ParserStatementsModules
+from compiler.parser.statements.variables import ParserStatementsVariables
+from compiler.parser.statements.functions import ParserStatementsFunctions
 from compiler.parser.expressions import ParserExpressions
 
 from compiler.tokenizer.interfaces import Token
@@ -15,9 +15,9 @@ from typing import *
 
 
 class ParserDeclarations(
-    ParserModules,
-    ParserDeclarationVariables,
-    ParserDeclarationsFunctions,
+    ParserStatementsModules,
+    ParserStatementsVariables,
+    ParserStatementsFunctions,
     ParserExpressions,
     ParserBase
 ):

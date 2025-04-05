@@ -26,3 +26,11 @@ class Array(Value):
 @dataclass
 class Compound(Value):
     value:Dict[str,BaseNode]
+
+@dataclass
+class Coordinate(Value):
+    x:Value
+    y:Value
+    z:Value
+    type:str #world local relative
+    

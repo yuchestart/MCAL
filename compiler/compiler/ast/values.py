@@ -17,10 +17,25 @@ class Value(Expression):
     pass
 
 @dataclass
+class Block(BaseNode):
+    statements: List[BaseNode]
+
+@dataclass
 class Identifier(BaseNode):
     ident:str
+
+@dataclass
+class Access(BaseNode):
+    root:Identifier
+    key:Identifier
 
 @dataclass
 class OperatorChain(Expression):
     operations:List[str]
     operands:List[Expression]
+
+@dataclass
+class UnaryOperation(Expression):
+    operator:str
+    operand:Expression
+    after:bool

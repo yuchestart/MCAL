@@ -8,7 +8,7 @@ class ParserException(Exception):
         self.kind = kind
         self.pos = pos
     def print(self):
-        printError(self.kind,self.pos)
+        printError("Invalid Syntax: "+self.kind,self.pos)
 
 
 class ParserBase():

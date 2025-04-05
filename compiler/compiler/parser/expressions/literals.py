@@ -20,7 +20,7 @@ import pcre2
 
 class ParserExpressionsLiterals(ParserExpressionsBase):
     # Use regular RE for this, as pcre2 throws an error
-    REGEX_NUMBER_SPLITTER = r"(-?\d+(?:\.\d+)?)(u|s|U|S)?([bBsSiIlLfFdD])?\b"
+    REGEX_NUMBER_SPLITTER = r"(-?\d+(?:\.\d+)?)([uUsS])?([bBsSiIlLfFdD])?\b"
     NUMBER_SUFFIX_DTYPES = {
         "i": IntDType,
         "l": LongDType,
@@ -29,6 +29,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
         "f": FloatDType,
         "d": DoubleDType,
     }
+
 
     def parse_expression_bool(self, tokens: List[Token]) -> Tuple[int, Boolean | None]:
         finalidx = 0
@@ -55,8 +56,8 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
                 break
 
             match = re.match(self.REGEX_NUMBER_SPLITTER, token.data)
-            groups: Tuple[str] = list(filter(lambda x: x is not None,match.groups()))
-            ret = Number(groups[0],IntDType())
+            groups: Tuple[str] = list(filter(lambda x: x is not None, match.groups()))
+            ret = Number(groups[0], IntDType())
 
             if len(groups) == 3:
                 ret.signed = groups[1].lower() == "s"
@@ -76,9 +77,8 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
                 continue
             if t.type != "STRING":
                 return finalidx, ret
-            raw_str = t.data[1:-1] # Remove the quotes
+            raw_str = t.data[1:-1]  # Remove the quotes
             break
-        
 
         # String substitution expressions, like ${}
         # Any string breaking characters inside one still must be escaped with \
@@ -104,7 +104,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
                 if char != "{":
                     state = "none"
                 state = "substituting"
-                #delete the $
+                # delete the $
                 final_str = final_str[:-1]
                 continue
             elif state == "substituting":
@@ -115,8 +115,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
                 cursub = []
                 elevation = 0
                 nexti = 0
-                print(i)
-                for j,t in enumerate(rest):
+                for j, t in enumerate(rest):
                     if self.ignore(t):
                         continue
                     if t.type == "BLOCK_START":
@@ -127,7 +126,7 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
                             nexti = j
                             break
                     cursub.append(t)
-                sub_str[(i, i+nexti)] = cursub
+                sub_str[(i, i + nexti)] = cursub
                 i += nexti
                 state = "none"
             final_str += char
@@ -184,35 +183,90 @@ class ParserExpressionsLiterals(ParserExpressionsBase):
                     break
                 else:
                     raise ParserException(
-                        f"Invalid Syntax: Expected ',' or ']' but got {token}",
-                        token.position
+                        f"Expected ',' or ']' but got {token}",
+                        token.position,
                     )
 
         return finalidx, ret
 
     def parse_expression_compound(
         self, tokens: List[Token]
-    ) -> Tuple[int, Value | None]:
-        #TODO: Implement
-        return 0, None
+    ) -> Tuple[int, Compound | None]:
+        ret = None
+        idx = None
 
-    def parse_expression_literal(
-        self, tokens:List[Token]
-    ) -> Tuple[int, Value | None]:
+        isemptycompound = False
+        value = {}
+        currentKey = ""
+
+        state = "start"
+        for i, token in enumerate(tokens):
+            if self.ignore(token):
+                continue
+
+            if state == "start":
+                if token.type != "BLOCK_START":
+                    # Not a compound
+                    break
+                state = "key"
+            elif state == "key":
+                if token.type != "STRING":
+                    if len(value) > 0:
+                        raise ParserException(
+                            "Expected '}' or key.", token.position
+                        )
+                    else:
+                        # Either not a compound or {}
+                        if token.type == "GROUP_END":
+                            idx = i
+                            isemptycompound = True
+                        break
+                currentKey = token.data[1:-1] # Strip the ""s
+                
+                if currentKey in value:
+                    raise ParserException(
+                        f"{currentKey} already exists in compound.", token.position
+                    )
+                state = "seperator"
+            elif state == "seperator":
+                if token.type != "OPERATOR" or token.data != ":":
+                    raise ParserException(
+                        "Expected ':'.", token.position
+                    )
+                state = "value"
+            elif state == "value":
+                j, expr = self.parse_expression(tokens[i:])
+                i = j
+                value[currentKey] = expr
+                state = "comma"
+            elif state == "comma":
+                if token.type == "GROUP_END":
+                    idx = i
+                    break
+                elif token.type != "LIST_SEPERATOR":
+                    raise ParserException(
+                        "Expected ','.", token.position
+                    )
+                state = "key"
+        if isemptycompound or len(value) > 0:
+            ret = Compound(value)
+        return idx, ret
+
+    def parse_expression_literal(self, tokens: List[Token]) -> Tuple[int, Value | None]:
         parsers = [
             self.parse_expression_array,
             self.parse_expression_bool,
             self.parse_expression_compound,
             self.parse_expression_number,
-            self.parse_expression_string
+            self.parse_expression_string,
         ]
         ret: Value | None = None
-        finalpos:int = 0
+        finalpos: int = 0
         for parser in parsers:
             pos, node = parser(tokens)
             if node is not None:
                 ret = node
                 finalpos = pos
                 break
-        
-        return finalpos,ret
+
+        return finalpos, ret

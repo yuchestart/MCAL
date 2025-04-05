@@ -4,7 +4,7 @@ from compiler.tokenizer.regex import subset_regex, TOKEN_PRIORITY
 
 from compiler.ast.base import BaseNode
 
-from compiler.parser.declarations import ParserDeclarations
+from compiler.parser.statements import ParserDeclarations
 from compiler.parser.expressions import ParserExpressions
 from compiler.parser.expressions.datatypes import ParserDataTypes
 

@@ -1,5 +1,6 @@
 
 from dataclasses import dataclass
+from compiler.ast.base import BaseNode
 from compiler.ast.values import DataType,Expression,Value
 from compiler.ast.primitives import String, Coordinate
 from typing import *
@@ -42,3 +43,4 @@ class StorageInstantiation(MinecraftObjInstantiation):
 class CommandCall(Expression):
     command: str
     parameters: String
+    substitutions: dict[tuple[int,int],BaseNode]

@@ -4,7 +4,7 @@ from compiler.parser.expressions.base import ParserExpressionsBase
 from compiler.tokenizer.interfaces import Token
 
 from compiler.ast.variables import AssignmentExpression
-from compiler.ast.values import OperatorChain, Identifier, Expression
+from compiler.ast.values import OperatorChain, UnaryOperation, Identifier, Expression
 
 from typing import *
 import re
@@ -24,9 +24,10 @@ class ParserExpressionsCalculations(ParserExpressionsBase):
                 continue
             if state == "expr":
                 j,expr = self.parse_expression_atom(tokens[i:])
+                print(j,expr)
                 if expr is None and len(operators) > 0:
                     raise ParserException(
-                        "Invalid Syntax: Expected expression",
+                        "Expected expression",
                         token.position
                     )
                 elif expr is None:
@@ -43,13 +44,46 @@ class ParserExpressionsCalculations(ParserExpressionsBase):
                 idx = i
                 state = "expr"
                 
-        if len(expressions) == 0:
+        if len(expressions) == 0 or len(operators) == 0:
             return 0, None
         
         retval = OperatorChain(operators,expressions)
         return idx,retval
 
+    UNARY_OPERATORS = "! + -".split(" ")
+    UNARY_AFTER_OPERATORS = "++ --".split(" ")
 
+    def parse_expression_unaryop(self,tokens:List[Token]) -> Tuple[int,UnaryOperation]:
+        ret = None
+        idx = 0
+        op = None
+
+        state = "operator"
+        for i, token in enumerate(tokens):
+            if self.ignore(token):
+                continue
+            if state == "operator":
+                if token.type == "OPERATOR" and token.data in self.UNARY_OPERATORS:
+                    op = token.data
+                    state = "expr"
+                elif token.type == "IDENTIFIER":
+                    # Handle potential postfix (unary after) operators
+                    ident = Identifier(token.data)
+                    if i + 1 < len(tokens) and tokens[i + 1].type == "OPERATOR" and tokens[i + 1].data in self.UNARY_AFTER_OPERATORS:
+                        ret = UnaryOperation(tokens[i + 1].data, ident, True)
+                        idx = i + 1
+                        break
+                    else:
+                        break
+                else:
+                    break
+            elif state == "expr":
+                if token.type == "IDENTIFIER":
+                    ident = Identifier(token.data)
+                ret = UnaryOperation(op, expr, False)
+                break
+
+        return idx, ret
 
     def parse_expression_group(self,tokens:List[Token]) -> Tuple[int,Expression]:
         
@@ -77,6 +111,8 @@ class ParserExpressionsCalculations(ParserExpressionsBase):
                 toparse = []
                 elevation = 0
                 for j,t in enumerate(tokens[i:]):
+                    if self.ignore(t):
+                        continue
                     if t.type == "GROUP_START":
                         elevation += 1
                     elif t.type == "GROUP_END":
@@ -84,7 +120,7 @@ class ParserExpressionsCalculations(ParserExpressionsBase):
                         if elevation < 0:
                             if j == 0:
                                 raise ParserException(
-                                    "Invalid Syntax: Expected expression.",
+                                    "Expected expression.",
                                     t.position
                                 )
                             i+=j
@@ -96,7 +132,7 @@ class ParserExpressionsCalculations(ParserExpressionsBase):
             elif state == "end":
                 if token.type != "GROUP_END":
                     raise ParserException(
-                        "Invalid Syntax: Expected ')'",
+                        "Expected ')'",
                         t.position
                     )
                 break

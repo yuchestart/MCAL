@@ -14,7 +14,6 @@ NUMBER
 BOOLEAN
 COORDINATE
 IDENTIFIER
-COMMAND_CALL
 FUNCTION_CALL
 OPERATOR
 BLOCK_START
@@ -55,9 +54,6 @@ TOKEN_REGEXES = {
     "IDENTIFIER" : r"\b[a-zA-Z_](?:[a-zA-Z_0-9.]|::|:)*\b",
     "FUNCTION_CALL" : r"(?=(?:\b[a-zA-Z_](?:[a-zA-Z_0-9.]|::|:)*\b)\s*\((?:.|\s)*\))",
 
-
-    #Commands
-    "COMMAND_CALL" : r"!(?:\(.*\))",
 
     #Misc.
     "COMMENT" : r'(?:\/\/.*$)|(?:\/\*(?:.|\n)*\*\/)',

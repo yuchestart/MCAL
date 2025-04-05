@@ -15,7 +15,7 @@ import pcre2
 from typing import *
 
 
-class ParserDeclarationVariables(ParserExpressions,ParserDataTypes,ParserBase):
+class ParserStatementsVariables(ParserExpressions,ParserDataTypes,ParserBase):
     def parse_variable_declaration(
         self, statement: str
     ) -> Tuple[bool, VariableDeclaration]:
@@ -42,14 +42,14 @@ class ParserDeclarationVariables(ParserExpressions,ParserDataTypes,ParserBase):
                 continue
             if token.type == "STATEMENT_SEPERATOR":
                 if len(retval.declarations) == 0:
-                    raise ParserException("Invalid Syntax: Unexpected ';'.",token.position)
+                    raise ParserException("Unexpected ';'.",token.position)
                 break
 
             if mode == "identifier":
                 if token.type != "IDENTIFIER":
-                    raise ParserException(f"Invalid Syntax: Unexpected '{token.data}'.",token.position)
+                    raise ParserException(f"Unexpected '{token.data}'.",token.position)
                 if name is not None:
-                    raise ParserException(f"Invalid Syntax: Unexpected identifier.",token.position)
+                    raise ParserException(f"Unexpected identifier.",token.position)
                 name = token.data
                 value = None
                 mode = "equal"
@@ -59,7 +59,7 @@ class ParserDeclarationVariables(ParserExpressions,ParserDataTypes,ParserBase):
                     retval.declarations.append((name,value))
                     continue
                 if token.type != "OPERATOR" or token.data != "=":
-                    raise ParserException(f"Invalid Syntax: Unexpected '{token.data}'.",token.position)
+                    raise ParserException(f"Unexpected '{token.data}'.",token.position)
                 mode = "value"
             elif mode == "value":
                 idx,v = self.parse_expression(matches[i:])
@@ -70,7 +70,7 @@ class ParserDeclarationVariables(ParserExpressions,ParserDataTypes,ParserBase):
                 retval.declarations.append((name,value))
             elif mode == "seperator":
                 if token.type != "LIST_SEPERATOR":
-                    raise ParserException(f"Invalid Syntax: Unexpected '{token.data}'.",token.position)
+                    raise ParserException(f"Unexpected '{token.data}'.",token.position)
                 
                 retval.declarations.append((name,value))
                 mode = "identifier"

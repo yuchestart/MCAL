@@ -17,7 +17,7 @@ from compiler.ast.dtypes import (
     NullableDType,
 )
 
-from compiler.ast.minecraftobjs import (
+from compiler.ast.minecraft import (
     MinecraftObjDType,
     StorageDType,
     EntityDType,
@@ -65,18 +65,18 @@ class ParserDataTypes(ParserBase):
                 continue
             if token.type not in ["PRIMITIVE", "IDENTIFIER", "OPERATOR"]:
                 raise ParserException(
-                    f"Invalid Syntax: Unexpected '{token.data}'.", token.position
+                    f"Unexpected '{token.data}'.", token.position
                 )
             if token.type == "PRIMITIVE":
                 if dtype:
                     raise ParserException(
-                        f"Invalid Syntax: Unexpected identifier.", token.position
+                        f"Unexpected identifier.", token.position
                     )
                 dtype = self.PRIMITIVE_DTYPE_MAP[token.data]("")
             if token.type == "IDENTIFIER":
                 if not isident:
                     raise ParserException(
-                        f"Invalid Syntax: Unexpected identifier.", token.position
+                        f"Unexpected identifier.", token.position
                     )
                 dtype.name = token.data
                 isident = False
@@ -88,12 +88,12 @@ class ParserDataTypes(ParserBase):
                     elevation -= 1
                     if elevation < 0:
                         raise ParserException(
-                            "Invalid Syntax: Unmatched '>'", token.position
+                            "Unmatched '>'", token.position
                         )
                     finalidx = i
                     break
         if elevation > 0:
-            raise ParserException("Invalid Syntax: Unmatched '<'", tokens[-1].position)
+            raise ParserException("Unmatched '<'", tokens[-1].position)
         return finalidx + 1, dtype
 
     # FIXME: Compiler errors for improper formatting don't work
@@ -114,7 +114,7 @@ class ParserDataTypes(ParserBase):
             if functionmode == "ret_start":
                 if token.type != "OPERATOR" or token.data != "<":
                     raise ParserException(
-                        "Invalid Syntax: Expected '<' after 'function'.", token.position
+                        "Expected '<' after 'function'.", token.position
                     )
                 functionmode = "ret"
                 elevation += 1
@@ -132,7 +132,7 @@ class ParserDataTypes(ParserBase):
                             elevation -= 1
                             if elevation < 0:
                                 raise ParserException(
-                                    "Invalid Syntax: Unmatched '>'", t.position
+                                    "Unmatched '>'", t.position
                                 )
                             i = j + i
                             break
@@ -143,7 +143,7 @@ class ParserDataTypes(ParserBase):
             elif functionmode == "param_start":
                 if token.type != "GROUP_START":
                     raise ParserException(
-                        "Invalid Syntax: Expected '(' after '>'", token.position
+                        "Expected '(' after '>'", token.position
                     )
                 functionmode = "param"
                 elevation += 1
@@ -161,14 +161,14 @@ class ParserDataTypes(ParserBase):
                         elevation -= 1
                         if elevation < 0:
                             raise ParserException(
-                                "Invalid Syntax: Unmatched ')'", t.position
+                                "Unmatched ')'", t.position
                             )
                         finalidx = j + i
                         break
                     if t.type == "LIST_SEPERATOR" and elevation == 0:
                         if len(currentparam) == 0:
                             raise ParserException(
-                                "Invalid Syntax: Unexpected ','", t.position
+                                "Unexpected ','", t.position
                             )
                         param_tokens.append(currentparam.copy())
                         currentparam = []
@@ -184,7 +184,7 @@ class ParserDataTypes(ParserBase):
                 break
 
         if elevation > 0:
-            raise ParserException("Invalid Syntax: Unmatched '<' or '('", tokens[-1].position)
+            raise ParserException("Unmatched '<' or '('", tokens[-1].position)
         return finalidx, dtype
 
     # HACK: Find cases where improper formatting doesn't throw a compiler error
@@ -257,7 +257,7 @@ class ParserDataTypes(ParserBase):
                     dtype = NullableDType(dtype)
                 else:
                     raise ParserException(
-                        f"Invalid Syntax: Unexpected '{token.data}'.", token.position
+                        f"Unexpected '{token.data}'.", token.position
                     )
 
             if token.type == "ARRAY_START":
@@ -266,11 +266,11 @@ class ParserDataTypes(ParserBase):
                 elevation -= 1
                 if elevation < 0:
                     raise ParserException(
-                        "Invalid Syntax: Unmatched ']' after '['.", token.position
+                        "Unmatched ']' after '['.", token.position
                     )
                 dtype = ArrayDType(dtype)
 
         if elevation > 0:
-            raise ParserException("Invalid Syntax: Unmatched '['", tokens[-1].position)
+            raise ParserException("Unmatched '['", tokens[-1].position)
 
         return finalidx, dtype

@@ -46,6 +46,8 @@ class CompoundDType(DataType):
 class Void(DataType):
     pass
 
+class CoordinateDType(DataType):
+    pass
 
 @dataclass
 class ArrayDType(DataType):

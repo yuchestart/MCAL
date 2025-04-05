@@ -11,7 +11,7 @@ import pcre2
 from typing import *
 
 
-class ParserModules(ParserBase):
+class ParserStatementsModules(ParserBase):
 
     def parse_module_declaration(
         self, statement: str
@@ -41,7 +41,7 @@ class ParserModules(ParserBase):
                 if token_type != "KEYWORD" or data != "module":
                     if retval.extern:
                         raise ParserException(
-                            "Invalid Syntax: Expected 'module'", match.start()
+                            "Expected 'module'", match.start()
                         )
                     else:
                         # no extern or module, so probably just another statement
@@ -52,14 +52,14 @@ class ParserModules(ParserBase):
             # an identifier must follow module
             if token_type != "IDENTIFIER" and i <= 2:
                 raise ParserException(
-                    "Invalid Syntax: Expected identifier", match.start()
+                    "Expected identifier", match.start()
                 )
 
             # : is not allowed in module names. Use `namespace` for submodules.
             colon = pcre2.match(":",data)
             if colon:
                 raise ParserException(
-                    "Invalid Syntax: Invalid identifier format", colon.start()
+                    "Invalid identifier format", colon.start()
                 )
 
             # set module name
@@ -88,7 +88,7 @@ class ParserModules(ParserBase):
                 continue
 
             if i == 1 and match_type != "IDENTIFIER":
-                raise ParserException("Invalid Syntax: Expected namespace",match.start())
+                raise ParserException("Expected namespace",match.start())
 
             retval.ident = data
         
@@ -115,7 +115,7 @@ class ParserModules(ParserBase):
 
             #identifier after import
             if i == 1 and match_type != "IDENTIFIER":
-                raise ParserException("Invalid Syntax: Expected identifier",match.start())
+                raise ParserException("Expected identifier",match.start())
 
             retval.ident = data
 
