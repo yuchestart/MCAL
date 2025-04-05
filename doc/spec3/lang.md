@@ -269,6 +269,12 @@ import Example::someSymbol; //Imports a symbol from the module
 import Example::*; //Imports all the symbols top-level
 ```
 
+If you are exporting the contents of a whole module, use the `export` keyword in front of an import statement. Ex
+
+```mcal
+export import Example::*;
+```
+
 ## The `using` keyword
 The `using` keyword is used to reference namespaces without explicitly defining them. The intent of this is to make code more readable.
 
@@ -801,7 +807,7 @@ someFunction(instance as compound); //Explicit deserialization.
 
 ## Class Inheritance and Polymorphism
 
-Classes can inherit eachother via the `extends` keyword. Classes can only extend from one class.
+Classes can inherit eachother via the `:` operator. Classes can inherit from multiple classes. In the case where a symbol conflicts, the `using` keyword is used to address the conflict.
 
 Example:
 
@@ -810,7 +816,7 @@ class BaseClass{
     //...
 }
 
-class MyClass extends BaseClass{
+class MyClass : BaseClass{
     //...
 }
 ```
@@ -826,7 +832,7 @@ class BaseClass{
     }
 }
 
-class Extending extends BaseClass{
+class Extending : BaseClass{
     int prop;
     void method(Extending this){
         super.method(this); //An implicit cast occurs here.
@@ -861,6 +867,7 @@ struct [name]{
 ```
 
 To use structs, use the name of the struct as a datatype. If you need to create a struct, use the `new` keyword similar to classes.
+Structs can inherit from other structs with the `:` operator. If a conflicting name is found, the `using` keyword is used to resolve the dispute.
 
 Example:
 ```
@@ -869,12 +876,17 @@ struct CustomItemIdentifier{
     bool isPlaceable;
 }
 
+struct MyCustomItem : CustomItemIdentifier{
+    int cheese;
+}
+
 //...
 
 CustomItemIdentifier ci = new CustomItemIdentifier;
 ci.itemId = "red_emerald_block";
 ci.isPlaceable = true;
 ```
+
 
 # Minecraft Interop
 
