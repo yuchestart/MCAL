@@ -1,20 +1,23 @@
 import os
 import re
+from dataclasses import dataclass
+from typing import *
 
-class Token:
-    value:str
-    type:str
+Token = Dict[str,Any]
 
 class Tokenizer:
     code:str
     pos:int
-    def next(self,i=1):
+    def input_next(self,i=1):
+        if (self.pos + i) > len(self.code):
+            print(self.pos+i)
+            self.err("Unexpected EOF")
         ret = self.code[self.pos:self.pos+i]
-        pos += i
+        self.pos += i
         return ret
     
-    def peek(self,i=1):
-        return self.code[self.pos:self.pos+i]
+    def input_peek(self,i=1):
+        return self.code[self.pos:min(self.pos+i,len(self.code))]
     
     def eof(self):
         return self.pos == len(self.code)
@@ -23,22 +26,28 @@ class Tokenizer:
         print(f"Error @ {self.pos}: {msg}")
         raise Exception("Parsing Failed")
     
+    currentToken:Token|None = None
+
+    def token_peek(self):
+        if self.currentToken is None:
+            self.currentToken = self.read_next_token()
+        return self.currentToken
     
     KEYWORDS:list[str] = []
     BINARYOP:list[str] = []
     POSTFIXOP:list[str] = []
     PREFIXOP:list[str] = []
+    PUNCTUATION:list[str] = []
 
     COMMENT_REGEX:str = r"(?:\/\/.*$)|(?:\/\*(?:.|\n)*\*\/)"
-    GROUP_OPEN:list[str] = "[{(".split("")
-    GROUP_CLOSE:list[str] = "]})".split("")
-    TYPEGROUP_OPEN:str = "<"
-    TYPEGROUP_CLOSE:str = ">"
-    STATEMENT_SEPERATOR:str = ";"
-    LIST_SEPERATOR:str = ","
+    IDENT_START_REGEX:str = r"[a-zA-Z_$]"
+    IDENT_CHAR_REGEX:str = r"[a-zA-Z0-9_$]"
+    GROUP_OPEN:list[str] = "[{("
+    GROUP_CLOSE:list[str] = "]})"
 
     def init_tokenizer(self):
-        os.chdir(os.path.dirname(__file__))
+        self.pos = 0
+        #os.chdir(os.path.dirname(__file__))
         with open("parser/def/binaryop.txt") as f:
             self.BINARYOP = list(filter(lambda x: not x.startswith("#"),f.read().splitlines()))
         with open("parser/def/postfixop.txt") as f:
@@ -47,59 +56,212 @@ class Tokenizer:
             self.PREFIXOP = list(filter(lambda x: not x.startswith("#"),f.read().splitlines()))
         with open("parser/def/kw.txt") as f:
             self.KEYWORDS = list(filter(lambda x: not x.startswith("#"),f.read().splitlines()))
+        self.PUNCTUATION = [*{*self.BINARYOP, *self.POSTFIXOP, *self.PREFIXOP}]
 
-    DIGITS = "0123456789".split("")
-    SIGNS = "uUsS".split("")
-    NUMTYPES = "iIfFlLdDsSbB".split("")
+    DIGITS = "0123456789"
+    SIGNS = "uUsS"
+    NUMTYPES = "iIfFlLdDsSbB"
     NUMSPLITREGEX = r"(\d*\.\d*)([uUsS])?([iIfFlLdDsSbB])?"
-    def read_number(self):
+
+    def read_number(self) -> Token | None:
         s = ""
         has_dot = False
         has_digits = False
         has_sign = False
         has_type = False
         while (not self.eof()):
-            if self.peek() == ".":
+            if self.input_peek() == ".":
                 if has_dot:
                     self.err("Unexpected '.'")
                 has_dot = True
-            elif self.peek() in self.DIGITS:
+            elif self.input_peek() in self.DIGITS:
                 has_digits = True
-            elif self.peek() in self.NUMTYPES:
+            elif self.input_peek() in self.NUMTYPES:
                 if has_type:
-                    self.err(f"Unexpected '{self.peek()}'")
+                    self.err(f"Unexpected '{self.input_peek()}'")
                 if not has_digits:
-                    self.err(f"Unexpected '{self.peek()}'")
+                    self.err(f"Unexpected '{self.input_peek()}'")
                 has_type = True
-            elif self.peek() in self.SIGNS:
+            elif self.input_peek() in self.SIGNS:
                 if has_sign:
-                    self.err(f"Unexpected '{self.peek()}'")
+                    self.err(f"Unexpected '{self.input_peek()}'")
                 if has_type:
-                    self.err(f"Unexpected '{self.peek()}'")
-                    return False
+                    self.err(f"Unexpected '{self.input_peek()}'")
                 has_sign = True
             else:
                 break
-            s+=self.next()
-        
-        return 
+            s+=self.input_next()
+        if has_digits:
+            return dict(type="number",value=s)
+        return None
 
-    def skip_comment(self):
+    def skip_comment(self) -> None:
         comment = None
         while not self.eof():
             if comment is None:
-                if self.peek(2) == "//":
+                if self.input_peek(2) == "//":
                     comment = "oneline"
-                elif self.peek(2) == "/*":
+                elif self.input_peek(2) == "/*":
                     comment = "multiline"
                 else:
-                    continue
+                    break
             elif comment == "oneline":
-                if self.peek() == "\n":
+                if self.input_peek() == "\n":
                     break
-                self.next()
+                self.input_next()
             elif comment == "multiline":
-                if self.peek(2) == "*/":
-                    self.next(2)
+                if self.input_peek(2) == "*/":
+                    self.input_next(2)
                     break
-                self.next()
+                self.input_next()
+
+    
+    def read_name(self) -> Token | None:
+        ident = self.input_next() # This is guaranteed to be valid start char
+        while not self.eof():
+            if re.match(self.IDENT_CHAR_REGEX,self.input_peek()) is not None:
+                ident += self.input_next()
+            else:
+                break
+        return dict(type="ident",value=ident)
+
+    def read_string(self) -> Token | None:
+        chars = ""
+        startchar=self.input_next()
+        escaped = False
+        substitutions = {}
+        i = -1
+        while not self.eof():
+            i+=1
+            if self.input_peek() == "\\":
+                escaped = True
+                self.input_next()
+                continue
+            if escaped:
+                chars += self.input_next()
+                continue
+            elif self.input_peek() == startchar:
+                self.input_next()
+                break
+            elif self.input_peek(2) == "${":
+                self.input_next(2)
+                x = self.read_substitution()
+                substitutions[i] = x
+                continue
+            chars += self.input_next()
+        return dict(type="string",value=chars,substitutions=substitutions)
+
+    def read_substitution(self,brace_type="{}") -> list[Token]:
+        elevation = 0
+        tokens:list[Token] = []
+        while True:
+            next = self.read_next_token()
+            print("NX",next)
+            if next is None:
+                break
+            if next["type"] == "group_open" and next["value"] == brace_type[0]:
+                elevation += 1
+            elif next["type"] == "group_close" and next["value"] == brace_type[1]:
+                elevation -= 1
+                if elevation < 0:
+                    break
+            tokens.append(next)
+        return tokens
+    
+    def read_command(self,bchar="()") -> Token | None:
+        chars = ""
+        instring = False
+        elevation = 0
+        escape = 0
+        sub = {}
+        i = -1
+        while not self.eof():
+            i+=1
+           # print(chars)
+            if escape:
+                chars += self.input_next(escape)
+                i+=escape
+                escape = 0
+                continue
+            #region escapes
+            #escaped normal
+            if self.input_peek() == "\\" and not bool(instring):
+                escape = 1
+                continue
+            if self.input_peek(3) == "\\${":
+                escape = 2
+                self.input_next()
+                continue
+            if self.input_peek(2) == f"\\{bchar[1]}":
+                escape = 1
+                self.input_next()
+                continue
+            #\\${ or \\) i.e. escaped backslash
+            if self.input_peek(4) == "\\\\${" or self.input_peek(3) == f"\\\\{bchar[1]}" and not bool(instring):
+                escape = 1
+                self.input_next()
+                continue
+            #endregion
+            #strings
+            if self.input_peek() in "\'\"":
+                if not bool(instring):
+                    instring = None
+                else:
+                    instring = self.input_peek()
+            #substitutions:
+            if self.input_peek(2) == "${":
+                self.input_next(2)
+                sub[i] = self.read_substitution()
+            #braces
+            if self.input_peek() == bchar[1] and not bool(instring):
+                elevation -= 1
+                if elevation <= 0:
+                    break
+            elif self.input_peek() == bchar[0] and not bool(instring):
+                elevation += 1
+            #print(chars,i,elevation,bchar[1]==self.input_peek(),instring)
+            chars += self.input_next(1)
+        return dict(type="command",value=chars,substitutions=sub)
+        
+
+    def read_next_token(self) -> Token | None:
+        while not self.eof() and re.match(r"\s",self.input_peek()) is not None:
+            self.input_next()
+        if self.eof():
+            return None
+        self.skip_comment()
+        ch = self.input_peek()
+        if ch in "\"'":
+            return self.read_string()
+        if ch in self.DIGITS:
+            return self.read_number()
+        if re.match(self.IDENT_START_REGEX,ch) is not None:
+            for kw in self.KEYWORDS:
+                if self.input_peek(len(kw)) == kw:
+                    self.input_next(len(kw))
+                    return dict(type="keyword",value=kw)
+            return self.read_name()
+        if ch in self.GROUP_OPEN:
+            return dict(type="group_open",value=self.input_next())
+        if ch in self.GROUP_CLOSE:
+            return dict(type="group_close",value=self.input_next())
+        if ch == ";":
+            return dict(type="statement_seperator",value=self.input_next())
+        if ch == ",":
+            return dict(type="list_seperator",value=self.input_next())
+        if self.input_peek(2) == "!(":
+            self.input_next(2)
+            return self.read_command("()")
+        if self.input_peek(2) == "!{":
+            self.input_next(2)
+            return self.read_command("{}")
+        for op in self.PUNCTUATION:
+            if self.input_peek(len(op)) == op:
+                self.input_next(len(op))
+                return dict(type="punc",value=op)
+        self.err(f"Can't handle character '{ch}'.")
+    
+    def next_token(self) -> Token | None:
+        tok = self.currentToken
+        self.currentToken = None
+        return tok or self.read_next_token()
