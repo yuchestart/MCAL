@@ -12,7 +12,6 @@ break
 ## function
 return
 void
-entrypoint
 ## error
 try
 catch
