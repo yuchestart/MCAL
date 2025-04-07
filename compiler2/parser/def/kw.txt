@@ -11,6 +11,7 @@ continue
 break
 ## function
 return
+void
 entrypoint
 ## error
 try
@@ -37,17 +38,17 @@ private
 protected
 static
 partial
-super
 new
+this
 ## polymorphism
-interface
-extends
-implements
+super
 # data
+struct
 as
 null
 copy
 delete
+const
 # mincraft
 dec_scoreboard
 dec_command
@@ -67,3 +68,4 @@ coordinate
 entity
 block
 storage
+function
