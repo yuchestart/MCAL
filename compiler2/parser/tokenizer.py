@@ -47,7 +47,7 @@ class Tokenizer:
 
     def init_tokenizer(self):
         self.pos = 0
-        #os.chdir(os.path.dirname(__file__))
+        # TODO: Auto-walk the path thingy
         with open("parser/def/binaryop.txt") as f:
             self.BINARYOP = list(filter(lambda x: not x.startswith("#"),f.read().splitlines()))
         with open("parser/def/postfixop.txt") as f:
@@ -56,8 +56,15 @@ class Tokenizer:
             self.PREFIXOP = list(filter(lambda x: not x.startswith("#"),f.read().splitlines()))
         with open("parser/def/kw.txt") as f:
             self.KEYWORDS = list(filter(lambda x: not x.startswith("#"),f.read().splitlines()))
-        self.PUNCTUATION = [*{*self.BINARYOP, *self.POSTFIXOP, *self.PREFIXOP}]
-
+        self.PUNCTUATION = [*{
+            *self.BINARYOP,
+            *self.POSTFIXOP,
+            *self.PREFIXOP,
+            *self.GROUP_OPEN,
+            *self.GROUP_CLOSE
+        }]
+        self.PUNCTUATION.sort(key=lambda x: len(x),reverse=True)
+        self.KEYWORDS.sort(key=lambda x: len(x),reverse=True)
     DIGITS = "0123456789"
     SIGNS = "uUsS"
     NUMTYPES = "iIfFlLdDsSbB"
@@ -159,9 +166,9 @@ class Tokenizer:
             print("NX",next)
             if next is None:
                 break
-            if next["type"] == "group_open" and next["value"] == brace_type[0]:
+            if next["type"] == "punc" and next["value"] == brace_type[0]:
                 elevation += 1
-            elif next["type"] == "group_close" and next["value"] == brace_type[1]:
+            elif next["type"] == "punc" and next["value"] == brace_type[1]:
                 elevation -= 1
                 if elevation < 0:
                     break
@@ -235,20 +242,12 @@ class Tokenizer:
             return self.read_string()
         if ch in self.DIGITS:
             return self.read_number()
+        for kw in self.KEYWORDS:
+            if self.input_peek(len(kw)) == kw:
+                self.input_next(len(kw))
+                return dict(type="keyword",value=kw)
         if re.match(self.IDENT_START_REGEX,ch) is not None:
-            for kw in self.KEYWORDS:
-                if self.input_peek(len(kw)) == kw:
-                    self.input_next(len(kw))
-                    return dict(type="keyword",value=kw)
             return self.read_name()
-        if ch in self.GROUP_OPEN:
-            return dict(type="group_open",value=self.input_next())
-        if ch in self.GROUP_CLOSE:
-            return dict(type="group_close",value=self.input_next())
-        if ch == ";":
-            return dict(type="statement_seperator",value=self.input_next())
-        if ch == ",":
-            return dict(type="list_seperator",value=self.input_next())
         if self.input_peek(2) == "!(":
             self.input_next(2)
             return self.read_command("()")
@@ -261,7 +260,7 @@ class Tokenizer:
                 return dict(type="punc",value=op)
         self.err(f"Can't handle character '{ch}'.")
     
-    def next_token(self) -> Token | None:
+    def token_next(self) -> Token | None:
         tok = self.currentToken
         self.currentToken = None
         return tok or self.read_next_token()
