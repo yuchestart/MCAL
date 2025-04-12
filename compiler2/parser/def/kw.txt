@@ -68,3 +68,5 @@ entity
 block
 storage
 function
+# iterables
+lengthof
