@@ -1,0 +1,76 @@
+import "util.mcal";
+import "physics.d.mcal" as physics;
+import {officer::hud::HudDriver} from "officer.d.mcal";
+import {randrange} from "@random";
+
+using officer::hud;
+
+extern<mynamespace:sheep> void sheep(){
+    execute<as @a at @s>{
+        for(int i=0; i<10; i++){
+            coordinate pos = 0 0 0;
+            pos.type = ~;
+            pos.x = randrange(-5.0f,5.0f);
+            pos.y = randrange(0.0f,5.0f);
+            pos.z = randrange(-5.0f,5.0f);
+            summon(sheep! ${pos});
+        }
+    }
+}
+
+int add(int a, int b){
+    return a + b;
+}
+
+export add;
+
+class Animal{
+  public bool iscommunist;
+}
+
+class Leader{
+  public bool iscorrupt;
+  public int iscommunist;
+}
+
+class Napoleon : Animal, Leader{
+    using Animal::iscommunist;
+    static Napoleon create(){
+        Napoleon self = new Napoleon;
+        self.iscommunist = true;
+        self.iscorrupt = true;
+        return self;
+    }
+}
+
+struct 
+
+export class MyClass{
+    private int x;
+    public int x;
+    protected static int x;
+    public static void main(String[] args){
+      tellraw!(@a "1+1 is ${add(1,1)}")
+    }
+}
+
+export extern<minecraft:load> void main(){
+    !{
+        tellraw @a "Hi world!"
+    }
+    MyClass&? x = new MyClass;
+    int[] arr = [1,2,3,4,5,6,67,7,8];
+    compound mycompound = {
+      "public static":{
+        "void":"main",
+        "string":["args",0.0f]
+      }
+    };
+    /**PUBLIC STATIC VOID MAIN STRING ARGS */
+    int[]& ref = arr;
+    int[] notref = copy arr;
+    delete arr[0];
+    entity<minecraft:pig> = 
+}
+
+export *;
