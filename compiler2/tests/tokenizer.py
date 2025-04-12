@@ -11,6 +11,6 @@ def run_test() -> bool:
     i = 0
     while tokenizer.token_peek() is not None and i < 10:
         i+=1
-        print(tokenizer.next_token())
+        print(tokenizer.token_next())
 
     return True

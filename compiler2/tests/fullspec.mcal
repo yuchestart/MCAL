@@ -1,0 +1,209 @@
+/*
+This program is only used for testing the parser, not for running.
+
+*/
+
+import "util.mcal";
+import "physics.d.mcal" as physics;
+import {officer::hud::HudDriver} from "officer.d.mcal";
+import {randrange} from "@random";
+
+namespace hugeMess;
+
+const int PI = 3.1415926535;
+const int? landon = null;
+
+const bool[] values = [true,false];
+int x;
+float y;
+double z;
+byte w;
+short v;
+bool t;
+uuid u = new uuid(f751364d-6423-4d5a-acc2-0c3209e5cfe6);
+coordinate c = new coordinate(~3 ~ ~);
+coordinate d = new coordinate(^ ^4 ^);
+coordinate e = new coordinate(0 0 5);
+
+
+dec_scoreboard minecraft:carrot_on_a_stick.use controlboard;
+
+namespace evenHugerMess{
+
+using namespace officer::hud;
+
+
+dec_command<minecraft:tp>{
+  void|<selector[single]>
+  void|<selector[multi]> <selector[single]>
+  void|<coordinate>
+  void|<selector[multi]> <coordinate>
+  void|<selector[multi]> <coordinate> <float> <float>
+  void|<selector[multi]> <coordinate> facing <coordinate>
+  void|<selector[multi]> <coordinate> facing entity <selector[single]>
+}
+
+extern<mynamespace:sheep> void sheep(){
+    execute<as @a at @s>{
+        for(int i=0; i<10; i++){
+            coordinate pos = new coordinate(0 0 0);
+            pos.type = ~;
+            pos.x = randrange(-5.0f,5.0f);
+            pos.y = randrange(0.0f,5.0f);
+            pos.z = randrange(-5.0f,5.0f);
+            summon!(sheep ${pos});
+        }
+    }
+}
+
+int add(int a, int b){
+    return a + b;
+}
+
+export add;
+
+class Animal{
+  public bool isanimalist;
+  public int hunger;
+  protected void eat(){
+    tellraw!(@a "nom.");
+  }
+  private Soul soul;
+}
+
+class Leader{
+  public bool iscorrupt;
+  public int isanimalist;
+}
+
+partial class Napoleon : Animal, Leader{
+    //Here I'm testing the using keyword
+    using Animal::isanimalist;
+    static Napoleon create(){
+        Napoleon self = new Napoleon;
+        self.isanimalist = true;
+        self.iscorrupt = true;
+        return self;
+    }
+    void dostuff(){
+      super.Animal::eat();
+      this.hunger--;
+    }
+}
+
+struct Soul{
+  long soulmagic;
+}
+
+export class MyClass{
+    private int x;
+    public int x;
+    protected static int x;
+    public static void main(String[] args){
+      tellraw!(@a "1+1 is ${add(1,1)}")
+    }
+}
+
+bool controlflow(){
+  string name = "Jeremy Edouard Abu-Jabbar Vikram";
+  string title = "(Former)President of the Republic of Hippistan"
+  int age = 30;
+  string[] accomplishments = [
+    "Got president",
+    "Formed security forces(HSF)",
+    "Invaded sector 58 of the Union",
+    "Lost sector 58 and yaharra to Union",
+    "Lost battle of Nova-Jasinka to HUDG",
+    "Lost battle of Muscadad to HUDG",
+    "Lost battle of Jeremyedouardabujabbarvikramville to HRA",
+    "Lost Muscadad province to HUDG",
+    "Lost battle of the House of the Sultanate of Hippistan to HUDG",
+    "Lost battle of Baston to HUDG",
+    "Got ousted by HUDG"
+  ];
+  tellraw!(@a "I am ${name}, ${title}. I'm of age ${age}.")
+  if(age > 14){
+    tellraw!(@a "${name} is an unc");
+  } elif (age < 14){
+    tellraw!(@a "${name} is a young jit");
+  } else {
+    tellraw!(@a "${name} is a bro");
+  }
+  tellraw!(@a "I have accomplished");
+  int i=lengthof accomplishments;
+  while(--i > 0){
+    tellraw!(@a "${accomplishments[i]}");
+  }
+  int i = 1;
+  do{
+    tellraw!(@a "niche loops still work now ${i}");
+    i++;
+  }while(i <= 10);
+  switch(age){
+    case 30:
+    tellraw!(@a "it works");
+    break;
+    default:
+    tellraw!(@a "GET OUT");
+    break;
+  }
+  try{
+    throw "Nuh uh!";
+  } catch (string err){
+    tellraw!(@a "Overwatch <:Overwatch detects malignant anti-citizen activity. Quoting citizen #283,:>");
+    tellraw!(@a "Overwatch(quote) <:${err}:>");
+    tellraw!(@a "Overwatch <:All units amputate anti-citizen.:>");
+  } finally {
+    tellraw!(@a "C17:i4-3821 <:target spotted, firing.:>");
+    tellraw!(@a "NO PLEASE! *gunshots*");
+    tellraw!(@a "Overwatch <:Unit 3821 your family cohesion is preserved.:>");
+    tellraw!(@a "C17:i4-3821 <:copy.:>")
+  }
+  string good_citizen = "be combine";
+  try{
+  assert "Gordon Freeman" == good_citizen;
+  }catch{
+    tellraw!(@a "whatdya expect?");
+  }
+}
+
+export extern<minecraft:load> void main(){
+    !{
+        # le comment
+        tellraw @a "Hi world!"
+    }
+    MyClass&? x = new MyClass;
+    int[] arr = [1,2,3,4,5,6,67,7,8];
+    compound mycompound = {
+      "public static":{
+        "void":"main",
+        "string":["args",0.0f]
+      }
+    };
+    /**PUBLIC STATIC VOID MAIN STRING ARGS */
+    int[]& ref = arr;
+    int[] notref = copy arr;
+    delete arr[0];
+    execute<at @p>{
+      //TO HECK WITH null safety
+      entity<minecraft:pig> snowball = new entity<minecraft:pig>(@e[type=pig,limit=1,sort=nearest]) as entity<minecraft:pig>;
+      snowball.Motion = [0d,20d,0d]; //Say goodbye
+      //This should be null-safe
+      block<minecraft:chest>? chest = new block<minecraft:chest>(~ ~ ~);
+      if(chest == null){
+        tellraw!(@a "GO STAND IN A CHEST");
+        return;
+      }
+      chest.Lock = "1234"; //best password ever
+    }
+    storage everybody = new storage<important:user_registry>;
+    delete everybody;
+
+    if(controlflow()){
+      tellraw!(@a "YAY TURING COMPLETE");
+    }
+}
+
+export *;
+
+}
