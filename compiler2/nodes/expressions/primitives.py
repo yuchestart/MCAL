@@ -30,3 +30,17 @@ class Coordinate:
     x:Any
     y:Any
     z:Any
+
+@dataclass
+class Compound:
+    data:dict[str,Any]
+
+@dataclass
+class Array:
+    elements:list[Any]
+
+@dataclass
+class AnonymousFunction:
+    returntype:Any
+    parameters:list[tuple[str,Any]]
+    code:CodeBlock
