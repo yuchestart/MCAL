@@ -26,9 +26,9 @@ default
 import
 export
 extern
-module
 using
 namespace
+from
 # oop
 ## classes
 class

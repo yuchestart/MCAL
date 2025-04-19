@@ -32,8 +32,11 @@ namespace evenHugerMess{
 
 using namespace officer::hud;
 
+function<void>() x = new function<void>(int a, int b){
+  tellraw!(@a "${a} + ${b} = ${a+b}");
+}
 
-dec_command<minecraft:tp>{
+dec_command<minecraft:tp>!{
   void|<selector[single]>
   void|<selector[multi]> <selector[single]>
   void|<coordinate>
@@ -115,11 +118,15 @@ bool controlflow(){
     "Lost sector 58 and yaharra to Union",
     "Lost battle of Nova-Jasinka to HUDG",
     "Lost battle of Muscadad to HUDG",
-    "Lost battle of Jeremyedouardabujabbarvikramville to HRA",
+    "Lost battle of Jeremyedouardabujabbarvikramville to HNA",
     "Lost Muscadad province to HUDG",
-    "Lost battle of the House of the Sultanate of Hippistan to HUDG",
+    "Lost battle of the House of the Sultanate of Hippistan to HNA",
     "Lost battle of Baston to HUDG",
-    "Got ousted by HUDG"
+    "Got ousted by HUDG",
+    "HSF Surrenders",
+    "Fled to Northern Federation",
+    "Got captured by Federal police",
+    "Remains in prison"
   ];
   tellraw!(@a "I am ${name}, ${title}. I'm of age ${age}.")
   if(age > 14){
@@ -167,11 +174,16 @@ bool controlflow(){
   }
 }
 
+void func(){
+
+}
+
 export extern<minecraft:load> void main(){
     !{
         # le comment
         tellraw @a "Hi world!"
     }
+
     MyClass&? x = new MyClass;
     int[] arr = [1,2,3,4,5,6,67,7,8];
     compound mycompound = {

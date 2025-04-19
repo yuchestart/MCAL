@@ -9,6 +9,7 @@ class VariableDeclaration:
 
 @dataclass
 class FunctionDeclaration:
+    name:str
     returntype:Any
     parameters:list[tuple[str,Any]]
     code:CodeBlock

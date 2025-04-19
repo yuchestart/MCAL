@@ -7,7 +7,7 @@ class ArrayAccess:
 
 @dataclass
 class Identifier:
-    chain:list[str|ArrayAccess]
+    ident:str
 
 @dataclass
 class Name:
@@ -36,10 +36,17 @@ class BlockDataType:
     name:str
 
 @dataclass
-class ModifiedDataType:
-    dtype:Any
+class DataType:
+    extern:Name|None
+    const:bool
+    base:Any
     chain:list[str]
 
 @dataclass
 class CodeBlock:
     statements:list[any]
+
+@dataclass
+class AccessChain:
+    of:Any
+    what:list[tuple[str,Identifier|Any]]

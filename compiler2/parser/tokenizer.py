@@ -7,10 +7,12 @@ Token = Dict[str,Any]
 
 class Tokenizer:
     code:str
+    tokens:list[Token]
     pos:int
+    mode:str
     def input_next(self,i=1):
         if (self.pos + i) > len(self.code):
-            print(self.pos+i)
+           # print(self.pos+i)
             self.err("Unexpected EOF")
         ret = self.code[self.pos:self.pos+i]
         self.pos += i
@@ -20,7 +22,11 @@ class Tokenizer:
         return self.code[self.pos:min(self.pos+i,len(self.code))]
     
     def eof(self):
-        return self.pos == len(self.code)
+        if self.mode == "code":
+            length = len(self.code)
+        elif self.mode == "tokens":
+            length = len(self.tokens)
+        return self.pos == length
 
     def err(self,msg):
         print(f"Error @ {self.pos}: {msg}")
@@ -33,11 +39,17 @@ class Tokenizer:
             self.currentToken = self.read_next_token()
         return self.currentToken
     
+    def token_next(self) -> Token | None:
+        tok = self.currentToken
+        self.currentToken = None
+        return tok or self.read_next_token()
+
     KEYWORDS:list[str] = []
     BINARYOP:list[str] = []
     POSTFIXOP:list[str] = []
     PREFIXOP:list[str] = []
     PUNCTUATION:list[str] = []
+    OTHEROP:list[str] = []
 
     COMMENT_REGEX:str = r"(?:\/\/.*$)|(?:\/\*(?:.|\n)*\*\/)"
     IDENT_START_REGEX:str = r"[a-zA-Z_$]"
@@ -45,8 +57,9 @@ class Tokenizer:
     GROUP_OPEN:list[str] = "[{("
     GROUP_CLOSE:list[str] = "]})"
 
-    def init_tokenizer(self):
+    def init_tokenizer(self,mode):
         self.pos = 0
+        #print(self.tokens if mode == "tokens" else None,self.pos)
         # TODO: Auto-walk the path thingy
         with open("parser/def/binaryop.txt") as f:
             self.BINARYOP = list(filter(lambda x: not x.startswith("#"),f.read().splitlines()))
@@ -56,15 +69,22 @@ class Tokenizer:
             self.PREFIXOP = list(filter(lambda x: not x.startswith("#"),f.read().splitlines()))
         with open("parser/def/kw.txt") as f:
             self.KEYWORDS = list(filter(lambda x: not x.startswith("#"),f.read().splitlines()))
+        with open("parser/def/miscop.txt") as f:
+            self.OTHEROP = list(filter(lambda x: not x.startswith("#"),f.read().splitlines()))
         self.PUNCTUATION = [*{
             *self.BINARYOP,
             *self.POSTFIXOP,
             *self.PREFIXOP,
             *self.GROUP_OPEN,
-            *self.GROUP_CLOSE
+            *self.GROUP_CLOSE,
+            *self.OTHEROP
         }]
+        # Make sure that longer (e.g. ::) doesn't get mistaken for shorter (e.g. :)
         self.PUNCTUATION.sort(key=lambda x: len(x),reverse=True)
         self.KEYWORDS.sort(key=lambda x: len(x),reverse=True)
+
+        self.mode = mode
+
     DIGITS = "0123456789"
     SIGNS = "uUsS"
     NUMTYPES = "iIfFlLdDsSbB"
@@ -121,7 +141,6 @@ class Tokenizer:
                     self.input_next(2)
                     break
                 self.input_next()
-
     
     def read_name(self) -> Token | None:
         ident = self.input_next() # This is guaranteed to be valid start char
@@ -163,7 +182,6 @@ class Tokenizer:
         tokens:list[Token] = []
         while True:
             next = self.read_next_token()
-            print("NX",next)
             if next is None:
                 break
             if next["type"] == "punc" and next["value"] == brace_type[0]:
@@ -223,15 +241,23 @@ class Tokenizer:
             if self.input_peek() == bchar[1] and not bool(instring):
                 elevation -= 1
                 if elevation <= 0:
+                    self.input_next(1)
                     break
             elif self.input_peek() == bchar[0] and not bool(instring):
                 elevation += 1
             #print(chars,i,elevation,bchar[1]==self.input_peek(),instring)
             chars += self.input_next(1)
-        return dict(type="command",value=chars,substitutions=sub)
-        
+        return dict(type="command",value=chars,substitutions=sub,start=bchar[0])   
+
+
 
     def read_next_token(self) -> Token | None:
+        if self.mode == "tokens":
+            if not self.eof():
+                self.pos += 1
+               # print(self.tokens,self.pos)
+                return self.tokens[self.pos-1]
+            return None
         while not self.eof() and re.match(r"\s",self.input_peek()) is not None:
             self.input_next()
         if self.eof():
@@ -259,8 +285,3 @@ class Tokenizer:
                 self.input_next(len(op))
                 return dict(type="punc",value=op)
         self.err(f"Can't handle character '{ch}'.")
-    
-    def token_next(self) -> Token | None:
-        tok = self.currentToken
-        self.currentToken = None
-        return tok or self.read_next_token()

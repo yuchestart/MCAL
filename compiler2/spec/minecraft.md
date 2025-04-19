@@ -17,5 +17,14 @@ Minecraft Interop
 
 # `entity`
 
+## Usage
+
+
+## Definition
+
 # `block`
+
+## Usage
+
+## Definition
 

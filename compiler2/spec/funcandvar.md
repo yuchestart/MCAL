@@ -6,7 +6,6 @@ Functions and Variables
 
 ## Declaration
 
-
 ## Usage
 
 ### References

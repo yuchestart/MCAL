@@ -7,6 +7,6 @@ import tests.parser as parser
 #     print("FAILURE: Tokenizer")
 
 if parser.run_test():
-    print("SUCCESS: Parser")
+   print("SUCCESS: Parser")
 else:
-    print("FAILURE: Parser")
+   print("FAILURE: Parser")

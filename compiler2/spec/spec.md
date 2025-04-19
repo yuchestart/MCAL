@@ -15,10 +15,9 @@ MCAL stands for **M**inecraft **C**ommand **A**bstraction **L**anguage. It is a 
 
 # Architecture
 
-At it's core, MCAL compiles to `.mcfunction` files. This is why keywords like `extern` and `entrypoint` exist. MCAL is also designed to allow for interface with mods, such as syntax for defining custom commands, entities, blocks, etc.. MCAL supports direct command execution as well, with the `!{}` syntax.
+At it's core, MCAL compiles to `.mcfunction` files. Because `.mcfunction` files can execute pretty much any command (afaik), MCAL also supports extending the language with custom entities, commands, and blocks. This is also how the MCAL standard library is written.
 
 The file extension for an MCAL source file is `.mcal`.
-
 For asthetics, an MCAL source file which is supposed to contain only definitions has the file extension `.d.mcal`. But these files are functionally similar to regular `.mcal` files.
 
 # Syntax

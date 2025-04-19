@@ -3,9 +3,20 @@ import re
 
 def run_test() -> bool:
     tokenizer = Tokenizer()
-    tokenizer.code = "!{tellraw @a \'1+1 is ${1+1}\'}"
+    tokenizer.code = """
+dec_command<minecraft:teleport>!{
+  void|<selector[single]>
+  void|<selector[multi]> <selector[single]>
+  void|<coordinate>
+  void|<selector[multi]> <coordinate>
+  void|<selector[multi]> <coordinate> <float> <float>
+  void|<selector[multi]> <coordinate> facing <coordinate>
+  void|<selector[multi]> <coordinate> facing entity <selector[single]>
+}
+
+"""
     tokenizer.pos = 0
-    tokenizer.init_tokenizer()
+    tokenizer.init_tokenizer("code")
     print(tokenizer.PUNCTUATION)
     print(re.match(r"\s",tokenizer.input_peek()))
     i = 0
