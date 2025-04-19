@@ -22,7 +22,8 @@ class Null:
 
 @dataclass
 class UUID:
-    value:list[int]
+    value:list[int]|str|None
+    selector:str|None
 
 @dataclass
 class Coordinate:
