@@ -1,3 +1,4 @@
+# These are meant to come before an atom
 #logic
 !
 #number

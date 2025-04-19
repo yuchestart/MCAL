@@ -1,10 +1,4 @@
-#assign
-=
-+=
--=
-*=
-/=
-%=
+# These operations can be chained
 #op
 +
 -
@@ -20,14 +14,3 @@
 >
 <=
 >=
-#var
-::
-:
-.
-#commands
-|
-^
-~
-#misc
-,
-;

@@ -1,0 +1,22 @@
+# There isn't a good place for these
+#variable
+?
+&
+#identifier
+::
+:
+.
+#commands
+|
+^
+~
+#seperators
+,
+;
+#assignment
+=
++=
+-=
+*=
+/=
+%=

@@ -1,6 +1,4 @@
-#variable
-?
-&
+# These are meant to come after an atom
 #number
 ++
 --
