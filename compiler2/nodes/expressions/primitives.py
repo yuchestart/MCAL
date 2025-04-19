@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import *
+from nodes.util import CodeBlock
 
 @dataclass
 class Number:
