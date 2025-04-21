@@ -43,10 +43,8 @@ class DataType:
     chain:list[str]
 
 @dataclass
-class CodeBlock:
-    statements:list[any]
-
-@dataclass
 class AccessChain:
     of:Any
     what:list[tuple[str,Identifier|Any]]
+
+CodeBlock = List[Any]
