@@ -7,10 +7,10 @@ class ParserBase(Tokenizer):
     def delimited(self, start, stop, seperator, parser, hardstop=True):
         nodes = []
         first = True
+      #  print(self.token_peek())
         if start:
             self.skip_punc(start)
         while not self.eof():
-            print(self.token_peek())
             if self.is_punc(stop):
                 break
             if first:
@@ -23,7 +23,6 @@ class ParserBase(Tokenizer):
         else:
             if not self.is_punc(stop):
                 self.err(f"Expected {stop}")
-        print(self.token_peek())
         return nodes
 
     def is_punc(self, value: str | list[str]) -> bool:
@@ -127,7 +126,7 @@ class ParserBase(Tokenizer):
     PRIMITIVES_FUNC = PRIMITIVES_VAR + ["void"]
     PRIMITIVES_INTS = "byte short int long"
 
-    def parse_datatype(self) -> Any | None:
+    def parse_datatype(self) -> DataType | None:
         const = False
         extern = None
         if self.is_keywords(["const", "extern"]):
@@ -139,6 +138,7 @@ class ParserBase(Tokenizer):
                     self.token_next()
                     self.skip_punc("<")
                     extern = self.parse_name()
+                    print(extern)
                     self.skip_punc(">")
 
         dtype = None
@@ -235,7 +235,7 @@ class ParserBase(Tokenizer):
     def parse_statement(self):
         pass
 
-    def parse_scope(self):
+    def parse_scope(self,toplevel=False,singular=False):
         pass
 
     def parse_definition(self, dt=False):
