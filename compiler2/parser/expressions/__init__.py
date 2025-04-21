@@ -41,10 +41,11 @@ class Expressions(
                     self.err("Expected Identifier")
                 accesses.append(("namespace",self.token_next()["value"]))
             elif self.is_punc("("):
+               # print(self.token_peek())
                 if "(" not in allowed:
                     self.err("Unexpected '('")
                 accesses.append(
-                    ("call", self.delimited("(", ")", ",", self.parse_expression()))
+                    ("call", self.delimited("(", ")", ",", self.parse_expression))
                 )
             else:
                 break
