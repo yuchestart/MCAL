@@ -149,6 +149,10 @@ class Tokenizer:
                 ident += self.input_next()
             else:
                 break
+        
+        for kw in self.KEYWORDS:
+            if ident == kw:
+                return dict(type="keyword",value=kw)
         return dict(type="ident",value=ident)
 
     def read_string(self) -> Token | None:
@@ -268,10 +272,6 @@ class Tokenizer:
             return self.read_string()
         if ch in self.DIGITS:
             return self.read_number()
-        for kw in self.KEYWORDS:
-            if self.input_peek(len(kw)) == kw:
-                self.input_next(len(kw))
-                return dict(type="keyword",value=kw)
         if re.match(self.IDENT_START_REGEX,ch) is not None:
             return self.read_name()
         if self.input_peek(2) == "!(":
