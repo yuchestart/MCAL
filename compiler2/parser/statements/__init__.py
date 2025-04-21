@@ -2,26 +2,53 @@ from parser.base import ParserBase
 from parser.statements.varandfunc import VarAndFuncStatements
 from parser.statements.mc import MinecraftStatements
 from parser.statements.oop import OOPStatements
+from parser.statements.control import ControlFlowStatements
 from parser.statements.modules import ModuleStatements
+from nodes.util import CodeBlock
 
 class Statements(
     MinecraftStatements,
     OOPStatements,
+    ControlFlowStatements,
     ModuleStatements,
     VarAndFuncStatements,
     ParserBase
 ):
     
     def parse_statement(self,use_sm=True):
+        #print(self.token_peek())
+        parsersnosm = [
+            self.parse_if,
+            self.parse_loop_for,
+            self.parse_loop_while,
+            self.parse_try,
+        ]
         parsers = [
-            
+            self.parse_throw,
+            self.parse_assert,
+            self.parse_expression
         ]
         value = None
-        for parser in parsers:
+        nosm = False
+        for parser in parsersnosm:
             value = parser()
             if value is not None:
+                nosm = True
                 break
-        if use_sm:
+        if value is None:
+            for parser in parsers:
+                value = parser()
+                if value is not None:
+                    break
+        if value is None:
+            dt = self.parse_datatype()
+            if dt.base is None:
+                self.err("dafuq?")
+            if self.token_peek()["type"] != "ident":
+                self.err("Expected identifier")
+            name = self.token_next()["value"]
+            value = self.parse_dec_variable(dt,name)
+        if use_sm and not nosm:
             self.skip_punc(";")
         return value
 
@@ -33,7 +60,7 @@ class Statements(
             self.parse_dec_function,
             self.parse_dec_variable,
         ]
-        if dt is None:
+        if dt.base is None:
             value = None
             for parser in nodtparser:
                 value = parser()
@@ -55,10 +82,9 @@ class Statements(
             self.parse_import,
             self.parse_export,
             self.parse_definition,
-            self.parse_statement,
         ]
         dt = self.parse_datatype()
-        if dt is not None:
+        if dt.base is not None:
             if self.token_peek()["type"] != "ident":
                 self.err("Expected name")
             name = self.token_next()["value"]
@@ -73,10 +99,12 @@ class Statements(
         self.skip_punc(";")
         return value
 
-    def parse_scope(self,toplevel = False):
+    def parse_scope(self,toplevel = False,singular=False):
         parser = self.parse_statement
         if toplevel:
             parser = self.parse_toplevel
+        if singular and not self.is_punc("{"):
+            return [parser()]
         self.skip_punc("{")
         statements = []
         while not self.eof():
