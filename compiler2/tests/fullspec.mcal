@@ -146,14 +146,6 @@ bool controlflow(){
     tellraw!(@a "niche loops still work now ${i}");
     i++;
   }while(i <= 10);
-  switch(age){
-    case 30:
-    tellraw!(@a "it works");
-    break;
-    default:
-    tellraw!(@a "GET OUT");
-    break;
-  }
   try{
     throw "Nuh uh!";
   } catch (string err){
