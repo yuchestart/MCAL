@@ -1,10 +1,10 @@
 from parser.tokenizer import Token
 from parser.expressions import Expressions
 from parser.base import ParserBase
-from nodes.statements.varandfunc import *
-from nodes.util import PrimitiveDataType,DataType
+from nodes.ast.statements.varandfunc import *
+from nodes.ast.util import PrimitiveDataType,DataType
 
-class VarAndFuncStatements(Expressions,ParserBase):
+class FuncAndVarStatements(Expressions,ParserBase):
     
     def parse_dec_variable_component(self,name=None):
         if name is None:
@@ -24,25 +24,32 @@ class VarAndFuncStatements(Expressions,ParserBase):
 
     def parse_dec_function_parameter(self):
         dtype = self.parse_datatype()
+        print("BRUH",self.token_peek(),dtype)
         if self.token_peek()["type"] != "ident":
             self.err("Expected name")
         name = self.token_next()["value"]
         value = None
         if self.is_punc("="):
             self.token_next()
+            print(self.token_peek())
             value = self.parse_expression()
+        print("YO",value)
         return {
             "dtype":dtype,
             "name":name,
             "value":value
         }
 
-    def parse_dec_variable(self,dtype:DataType,name:str):
-      #  print(dtype)
-        if dtype.base == PrimitiveDataType("void"):
+    def parse_dec_variable(self):
+        dtype = self.parse_datatype()
+        if (dtype.base is None or
+        dtype.base == PrimitiveDataType("void") or
+        dtype.extern is not None):
             return
-        if dtype.extern is not None:
+        if self.token_peek()["type"] != "ident":
             return
+        name = self.token_next()["value"]
+      #  print(dtype
         first = self.parse_dec_variable_component(name)
         if first is None:
             return
@@ -55,7 +62,20 @@ class VarAndFuncStatements(Expressions,ParserBase):
         )
 
     
-    def parse_dec_function(self,dtype,name:str):
+    def parse_dec_function(self,canextern=False):
+        dtype = self.parse_datatype()
+        print(dtype)
+        if not canextern:
+            if dtype.extern:
+                self.err("'extern' not allowed.")
+        if dtype.base is None:
+            return
+        print(self.token_peek())
+        if self.token_peek()["type"] != "ident":
+            return
+        name = self.token_next()["value"]
+        if not self.is_punc("("):
+            return
         self.skip_punc("(")
         # print("BRO",self.token_peek())
         parameters = None
@@ -63,9 +83,16 @@ class VarAndFuncStatements(Expressions,ParserBase):
             parameters = self.delimited("",")",",",self.parse_dec_function_parameter)
         else:
             self.skip_punc(")")
+        print("BRO")
         return FunctionDeclaration(
             name,
             dtype,
             parameters,
             self.parse_scope()
         )
+
+    def parse_return(self):
+        if not self.is_keywords("return"):
+            return
+        self.token_next()
+        return ReturnStatement(self.parse_expression())
