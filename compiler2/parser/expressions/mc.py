@@ -1,12 +1,14 @@
 from parser.base import ParserBase
 from typing import *
-from nodes.expressions.mc import *
+from nodes.ast.expressions.mc import *
 
 class MinecraftExpressions(ParserBase):
     def parse_command_call(self) -> CommandCall | None:
         if self.token_peek()["type"] not in ["ident","keyword"]:
             return
         name = self.parse_name()
+        if name is None:
+            return
         if self.token_peek()["type"] != "command" or self.token_peek()["start"] != "(":
             return
         s = self.token_next()

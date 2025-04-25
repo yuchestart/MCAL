@@ -1,6 +1,6 @@
 from parser.tokenizer import Tokenizer, Token
 from typing import *
-from nodes.util import *
+from nodes.ast.util import *
 
 
 class ParserBase(Tokenizer):
@@ -17,7 +17,7 @@ class ParserBase(Tokenizer):
                 first = False
             else:
                 self.skip_punc(seperator)
-            nodes.append(parser())
+            nodes.ast.append(parser())
         if hardstop:
             self.skip_punc(stop)
         else:
@@ -99,7 +99,7 @@ class ParserBase(Tokenizer):
                 mode = "colon"
             elif mode == "colon":
                 if self.token_peek()["type"] != "punc":
-                    self.err("Expected ':'")
+                    return
                 ident += self.token_next()["value"]
                 mode = "proceed"
             elif mode == "proceed":
@@ -126,7 +126,7 @@ class ParserBase(Tokenizer):
     PRIMITIVES_FUNC = PRIMITIVES_VAR + ["void"]
     PRIMITIVES_INTS = "byte short int long"
 
-    def parse_datatype(self) -> DataType | None:
+    def parse_datatype(self):
         const = False
         extern = None
         if self.is_keywords(["const", "extern"]):
@@ -136,15 +136,16 @@ class ParserBase(Tokenizer):
                     self.token_next()
                 elif self.is_keywords("extern"):
                     self.token_next()
+             #       print("BRO",self.token_peek())
                     self.skip_punc("<")
                     extern = self.parse_name()
-                    print(extern)
                     self.skip_punc(">")
 
         dtype = None
+   #     print(self.token_peek())
         if self.token_peek()["type"] == "keyword":
-            if self.token_peek()["value"] not in self.PRIMITIVES_FUNC:
-                self.err("Expected datatype")
+            if self.token_peek()["value"] not in self.PRIMITIVES_FUNC + ["signed","unsigned"]:
+                return DataType(None,False,None,[])
             if self.token_peek()["value"] in self.PRIMITIVES_INTS:
                 dtype = IntegerDataType(self.token_next()["value"], True)
             elif self.token_peek()["value"] in ["signed", "unsigned"]:
@@ -157,10 +158,10 @@ class ParserBase(Tokenizer):
                 dtype = IntegerDataType(self.token_next()["value"], signed)
             else:
                 dtype = self.token_next()["value"]
-
+    #        print("GETOUT",dtype)
+     #   print("GETOUT2",dtype)
         if dtype is None:
             dtype = self.parse_identifier()
-
         # If dtype is a primitive
         if type(dtype) == str and dtype in ("function entity block".split(" ")):
             # These three types have a typegroup (<...>), so skip the first bracket
@@ -192,6 +193,8 @@ class ParserBase(Tokenizer):
         if type(dtype) == str:
             dtype = PrimitiveDataType(dtype)
 
+       # print("HEAR ME",dtype)
+
         # Parse things like arrays and references
         mode = "none"
         typechain = []
@@ -217,12 +220,25 @@ class ParserBase(Tokenizer):
                 typechain.append("nullable")
                 self.token_next()
 
+     #   print("bruh",dtype)
+
         return DataType(
             extern=extern,
             const=const,
             base=dtype,
             chain=typechain
         )
+
+    def loop_parsers(self,parsers:list[Callable]) -> Any | None:
+        for parser in parsers:
+            print("LOOP",self.pos,parser,self.currentToken)
+            backtrackpos = self.pos+0
+            value = parser()
+            if value is not None:
+                return value
+            print("LOOP2",self.pos,backtrackpos,self.currentToken)
+            self.pos = backtrackpos
+            self.currentToken = None
 
     # These exist so that I can get intellisense on them
 
@@ -238,5 +254,5 @@ class ParserBase(Tokenizer):
     def parse_scope(self,toplevel=False,singular=False):
         pass
 
-    def parse_definition(self, dt=False):
+    def parse_definition(self):
         pass

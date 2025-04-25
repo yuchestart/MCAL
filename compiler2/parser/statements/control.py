@@ -1,8 +1,8 @@
 from parser.base import ParserBase
-from parser.statements.varandfunc import VarAndFuncStatements
-from nodes.statements.control import *
+from parser.statements.funcandvar import FuncAndVarStatements
+from nodes.ast.statements.control import *
 
-class ControlFlowStatements(VarAndFuncStatements,ParserBase):
+class ControlFlowStatements(FuncAndVarStatements,ParserBase):
     def parse_if(self):
         if not self.is_keywords("if"):
             return

@@ -1,17 +1,17 @@
 from parser.base import ParserBase
-from parser.statements.varandfunc import VarAndFuncStatements
+from parser.statements.funcandvar import FuncAndVarStatements
 from parser.statements.mc import MinecraftStatements
 from parser.statements.oop import OOPStatements
 from parser.statements.control import ControlFlowStatements
 from parser.statements.modules import ModuleStatements
-from nodes.util import CodeBlock
+from nodes.ast.util import CodeBlock
 
 class Statements(
     MinecraftStatements,
     OOPStatements,
     ControlFlowStatements,
     ModuleStatements,
-    VarAndFuncStatements,
+    FuncAndVarStatements,
     ParserBase
 ):
     
@@ -24,57 +24,32 @@ class Statements(
             self.parse_try,
         ]
         parsers = [
+            self.parse_dec_variable,
             self.parse_throw,
             self.parse_assert,
-            self.parse_expression
+            self.parse_expression,
+            self.parse_return
         ]
         value = None
         nosm = False
-        for parser in parsersnosm:
-            value = parser()
-            if value is not None:
-                nosm = True
-                break
+        nosmv = self.loop_parsers(parsersnosm)
+        nosm = bool(nosmv)
         if value is None:
-            for parser in parsers:
-                value = parser()
-                if value is not None:
-                    break
-        if value is None:
-            dt = self.parse_datatype()
-            if dt.base is None:
-                self.err("dafuq?")
-            if self.token_peek()["type"] != "ident":
-                self.err("Expected identifier")
-            name = self.token_next()["value"]
-            value = self.parse_dec_variable(dt,name)
+            value = self.loop_parsers(parsers)
+        print("V",value)
         if use_sm and not nosm:
             self.skip_punc(";")
         return value
 
-    def parse_definition(self,dt=None,name:str=None):
-        nodtparser = [
+    def parse_definition(self):
+        parsers = [
             self.parse_namespace,
-        ]
-        dtparser = [
+            self.parse_dec_class,
+            self.parse_dec_struct,
             self.parse_dec_function,
             self.parse_dec_variable,
         ]
-        if dt.base is None:
-            value = None
-            for parser in nodtparser:
-                value = parser()
-                if value is not None:
-                    break
-        else:
-            value = None
-            for parser in dtparser:
-                value = parser(dt,name)
-                if value is not None:
-                    break
-            if value is None:
-                self.err("Expected definition")
-        return value
+        return self.loop_parsers(parsers)
 
     def parse_toplevel(self):
         parsers = [
@@ -83,20 +58,8 @@ class Statements(
             self.parse_export,
             self.parse_definition,
         ]
-        dt = self.parse_datatype()
-        if dt.base is not None:
-            if self.token_peek()["type"] != "ident":
-                self.err("Expected name")
-            name = self.token_next()["value"]
-            value = self.parse_definition(dt,name)
-        else:
-            value = None
-            for parser in parsers:
-                value = parser()
-                if value is not None:
-                    break
+        value = self.loop_parsers(parsers)
         # print(value)
-        self.skip_punc(";")
         return value
 
     def parse_scope(self,toplevel = False,singular=False):

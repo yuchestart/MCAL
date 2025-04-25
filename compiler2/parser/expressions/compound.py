@@ -1,6 +1,6 @@
 from parser.base import ParserBase
 from typing import *
-from nodes.expressions.primitives import *
+from nodes.ast.expressions.primitives import *
 
 class CompoundExpressions(ParserBase):
     def parse_compound(self):

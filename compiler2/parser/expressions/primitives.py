@@ -1,4 +1,4 @@
-from nodes.expressions.primitives import *
+from nodes.ast.expressions.primitives import *
 from parser.base import ParserBase
 
 class PrimitiveExpressions(ParserBase):
@@ -31,6 +31,7 @@ class PrimitiveExpressions(ParserBase):
         return String(s["value"],subs)
     
     def parse_number(self) -> Number | None:
+        print("NUMBER",self.token_peek())
         if self.token_peek()["type"] != "number":
             return
         numstring:str = self.token_next()["value"]

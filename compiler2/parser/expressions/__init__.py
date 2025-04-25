@@ -1,6 +1,6 @@
 from parser.base import ParserBase
-from nodes.expressions.operations import *
-from nodes.util import *
+from nodes.ast.expressions.operations import *
+from nodes.ast.util import *
 from typing import *
 
 from parser.expressions.primitives import PrimitiveExpressions
@@ -97,10 +97,12 @@ class Expressions(
             self.parse_init_storage,
             self.parse_anonymous_function,
         ]
-        for parser in parsers:
-            value = parser()
-            if value is not None:
-                return value
+        v = self.loop_parsers(parsers)
+        if v is None:
+            ident = self.parse_identifier()
+            if ident is not None:
+                return New(ident)
+        return v
 
     def parse_atom(self):
        # print(self.token_peek(), self.eof())
@@ -111,16 +113,13 @@ class Expressions(
             self.parse_number,
             self.parse_string,
             self.parse_new,
+            self.parse_command_call,
             self.parse_identifier,
             self.parse_array,
             self.parse_compound,
         ]
 
-        for parser in parsers:
-          #  print(parser)
-            value = parser()
-            if value is not None:
-                return value
+        return self.loop_parsers(parsers)
 
 
     def parse_expression(self):

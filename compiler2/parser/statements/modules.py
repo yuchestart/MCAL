@@ -2,7 +2,7 @@ from parser.base import ParserBase
 from parser.expressions import Expressions
 from typing import *
 
-from nodes.statements.modules import *
+from nodes.ast.statements.modules import *
 
 class ModuleStatements(Expressions,ParserBase):
 
@@ -33,7 +33,7 @@ class ModuleStatements(Expressions,ParserBase):
             elif len(self.token_peek()["substitutions"]) > 0:
                 self.err("Substitutions aren't allowed in imports")
             source = self.token_next()["value"]
-
+        self.skip_punc(";")
         return Import(source,alias,imports)
 
     def parse_export(self):
@@ -43,21 +43,16 @@ class ModuleStatements(Expressions,ParserBase):
         # Export everything
         if self.is_punc("*"):
             self.skip_punc("*")
+            self.skip_punc(";")
             return Export("*")
-        id = self.parse_access_chain(["::"])
+        
         exports = []
-        export_id = False
-        if id is None:
-            symbol = self.parse_definition()
-            if symbol is None:
-                self.err("Expected symbol definition")
-            exports.append(symbol)
-        else:
-            symbol = self.parse_definition(id)
-            if symbol is None:
-                export_id = True
-                exports.append(id)
-        if export_id:
+
+        symbol = self.parse_definition()
+        if symbol is None:
+            id = self.parse_access_chain(["::"])
+            if id is None:
+                self.err("Expected symbol")
             mode = "sep"
             while not self.eof():
                 if mode == "ident":
@@ -71,6 +66,9 @@ class ModuleStatements(Expressions,ParserBase):
                         break
                     self.token_next()
                     mode = "ident"
+            self.skip_punc(";")
+        else:
+            exports = [symbol]
         return Export(exports)
 
 
@@ -83,6 +81,7 @@ class ModuleStatements(Expressions,ParserBase):
             return
         self.token_next()
         ns = self.parse_symboldef()
+        self.skip_punc(";")
         return UsingNamespace(ns)
 
     def parse_namespace(self):
@@ -95,4 +94,6 @@ class ModuleStatements(Expressions,ParserBase):
         block = None
         if self.is_punc("{"):
             block = self.parse_scope(True)
+        else:
+            self.skip_punc(";")
         return Namespace(ident,block)
