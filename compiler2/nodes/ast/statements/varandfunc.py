@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import *
-from nodes.util import CodeBlock
+from nodes.ast.util import CodeBlock
 
 @dataclass
 class VariableDeclaration:
@@ -13,3 +13,7 @@ class FunctionDeclaration:
     returntype:Any
     parameters:list[tuple[str,Any]]
     code:CodeBlock
+
+@dataclass
+class ReturnStatement:
+    expression:Any

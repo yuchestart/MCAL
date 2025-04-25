@@ -47,4 +47,8 @@ class AccessChain:
     of:Any
     what:list[tuple[str,Identifier|Any]]
 
+@dataclass
+class New:
+    of:Any
+
 CodeBlock = List[Any]
