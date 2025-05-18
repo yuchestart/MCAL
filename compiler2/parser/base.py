@@ -17,7 +17,7 @@ class ParserBase(Tokenizer):
                 first = False
             else:
                 self.skip_punc(seperator)
-            nodes.ast.append(parser())
+            nodes.append(parser())
         if hardstop:
             self.skip_punc(stop)
         else:

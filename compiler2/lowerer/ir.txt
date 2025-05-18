@@ -1,0 +1,20 @@
+def_func(name extern params code)
+call_func(name params)
+return(value?)
+
+new_stack()
+dispose_stack()
+store_stack(name,value)
+get_stack(name)
+store_heap(value) -> pointer
+get_heap(pointer) -> value
+delete(pointer)
+
+constant(value)
+
+loop(name,code,next)
+break()
+continue()
+if(condition,code)
+
+command_call(param,macros)

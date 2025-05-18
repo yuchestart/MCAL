@@ -1,0 +1,3 @@
+Phase 1 - Typecheck
+    1. Turn AST into symbols
+    2. Construct a graph

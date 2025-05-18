@@ -254,7 +254,12 @@ class Tokenizer:
             chars += self.input_next(1)
         return dict(type="command",value=chars,substitutions=sub,start=bchar[0])   
 
-
+    def read_execute(self) -> Token | None:
+        ret = ""
+        while self.input_peek() != ">":
+            ret += self.input_next()
+        self.input_next()
+        return dict(type="execute",value=ret)
 
     def read_next_token(self,preservepos = False) -> Token | None:
         if preservepos:
@@ -276,6 +281,9 @@ class Tokenizer:
                 return self.read_string()
             if ch in self.DIGITS:
                 return self.read_number()
+            if self.input_peek(9) == "execute!<":
+                self.input_next(9)
+                return self.read_execute()
             if re.match(self.IDENT_START_REGEX,ch) is not None:
                 return self.read_name()
             if self.input_peek(2) == "!(":

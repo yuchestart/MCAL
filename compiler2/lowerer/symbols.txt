@@ -1,0 +1,43 @@
+module(
+    name='x.mcal',
+    imports=[
+        '...'
+    ],
+    symbols=[
+        func(
+            extern='...',
+            returntype=...,
+            name='...',
+            params=...
+            impl=[
+                var('int','a',primitive(5,'int')),
+                
+            ]
+        ),
+    ]
+)
+
+# SYMBOLS
+func(extern,returntype,name,params,impl)
+var(type,name,assign)
+class(name,inherits,overrides,symbols)
+struct(name,inherits,overrides,symbols,mc)
+module(name,imports,symbols)
+
+# DATATYPES
+datatype(
+    base=<base>,
+    chain=[...]
+)
+# BASE TYPES
+type_primitive(type=...)
+type_symbol(name=...)
+
+# CONSTANTS
+primitive(value=...,type=...)
+compound(value=...)
+anonymous_func(returntype=...,params=...,impl=...)
+
+# CALLS
+call(name,params)
+access(name,access)

@@ -1,0 +1,55 @@
+# MCAL
+struct entity<minecraft:pig> technoblade{
+    bool nerd = false;
+    long soulmagic;
+}
+int fib(int n){
+    int a = 0;
+    int b = 1;
+    int next = b;
+    for(int i=0; i<n; i++){
+        a = b;
+        b = next;
+        next = a +b;
+    }
+    return next;
+}
+# IR
+define_function(
+    name="new_technoblade",
+    params=[],
+    code=[
+        store(
+            name='retval',
+            storage='internal',
+            value={'nerd':false,'soulmagic':0L}
+        ),
+        return(
+            value=get('retval','internal')
+        )
+    ]
+)
+define_function(
+    name='internal_loop1_func_fib',
+    code=[
+        store('a','stack0',b),
+        store('b','stack0',next),
+        store('next','stack0',operation(get('a','stack0'),get('b','stack0'),'+'))
+        store('i','stack0',
+            operation(get('i','stack0'),1,'+')
+        ),
+        if(operation(get('i','stack0'),get('n','stack0'),'<'),call_func('internal_loop1_func_fib'))
+    ]
+)
+define_function(
+    name="func_fib",
+    params=['n'],
+    code=[
+        store('a','stack0',0),
+        store('b','stack0',1),
+        store('next','stack0',0),
+        store('i','stack0',0),
+        store('n','stack0',getparam(n)),
+        call_func('internal_loop1_func_fib'),
+    ]
+)

@@ -15,3 +15,6 @@ mclc [options...] -- [files...]
 ```
 
 [View Specification](spec/spec.md)
+
+
+DEVELOPER NOTE: I'm definitely rewriting this a third time the codebase is a dumpster fire

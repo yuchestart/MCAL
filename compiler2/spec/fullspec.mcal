@@ -41,6 +41,9 @@ class Napoleon : Animal, Leader{
         self.iscorrupt = true;
         return self;
     }
+    void method(Napoleon& self){
+
+    }
 }
 
 struct 

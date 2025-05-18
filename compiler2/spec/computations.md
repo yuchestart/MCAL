@@ -4,6 +4,9 @@ Operations and Calculations
 
 # Datatypes
 
+available datatypes:
+byte, short, int, long, float, double, bool, compound, uuid
+
 ## Arrays
 
 ## Null and nullables

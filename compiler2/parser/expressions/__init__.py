@@ -71,6 +71,10 @@ class Expressions(
                 # print(self.POSTFIXOP,operand)
                 if self.is_punc(self.POSTFIXOP):
                     postfix.append(self.token_next()["value"])
+                elif self.is_keywords("as"):
+                    self.token_next()
+                    dtype = self.parse_datatype()
+                    postfix.append(("cast",dtype))
                 else:
                     break
         if len(prefix) == 0 and len(postfix) == 0:
@@ -123,7 +127,7 @@ class Expressions(
 
 
     def parse_expression(self):
-        # print(self.BINARYOP)
+        # print(self.BINARYOP) 1 + 2 + 3 .
         operands = []
         operators = []
         mode = "operand"

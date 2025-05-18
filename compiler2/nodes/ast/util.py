@@ -45,7 +45,7 @@ class DataType:
 @dataclass
 class AccessChain:
     of:Any
-    what:list[tuple[str,Identifier|Any]]
+    what:list[tuple[Literal['generic','property','namespace','call'],Identifier|Any]]
 
 @dataclass
 class New:
